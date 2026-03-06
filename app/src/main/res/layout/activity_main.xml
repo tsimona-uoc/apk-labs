@@ -1,19 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:background="#4A148C"> <LinearLayout
+    android:id="@+id/topBar"
+    android:layout_width="0dp"
+    android:layout_height="60dp"
+    android:background="#7B1FA2"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
 
     <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="LUCKY SEVENS"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvCoins"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="Coins: 125"
+        android:textColor="#FFD700"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/sideMenu"
+        android:layout_width="80dp"
+        android:layout_height="0dp"
+        android:background="#F3E5F5"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:text="⭐\nRanking"
+            android:textAlignment="center"
+            android:textColor="#4A148C"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💬\nChat"
+            android:textAlignment="center"
+            android:textColor="#757575"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvScores"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        app:layout_constraintBottom_toTopOf="@id/btnPlayGame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sideMenu"
+        app:layout_constraintTop_toBottomOf="@id/topBar" />
+
+    <Button
+        android:id="@+id/btnPlayGame"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#7E57C2"
+        android:text="😊 PLAY"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/sideMenu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
