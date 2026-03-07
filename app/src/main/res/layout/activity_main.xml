@@ -48,7 +48,7 @@
         app:layout_constraintTop_toBottomOf="@id/topBar">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:text="⭐\nRanking"
@@ -58,7 +58,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:text="💬\nChat"
             android:textAlignment="center"
@@ -66,15 +66,16 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvScores"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="16dp"
         app:layout_constraintBottom_toTopOf="@id/btnPlayGame"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/sideMenu"
-        app:layout_constraintTop_toBottomOf="@id/topBar" />
+        app:layout_constraintTop_toBottomOf="@id/topBar"/>
+
 
     <Button
         android:id="@+id/btnPlayGame"

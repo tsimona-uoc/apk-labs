@@ -57,4 +57,7 @@ dependencies {
     // RxJava
     implementation(libs.rxandroid)
     implementation(libs.rxjava)
+
+    // Fragments
+    implementation("androidx.fragment:fragment-ktx:1.8.9")
 }
