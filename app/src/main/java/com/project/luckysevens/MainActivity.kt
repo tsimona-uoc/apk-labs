@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
+import com.project.luckysevens.fragments.ranking.RankingFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,6 +19,11 @@ class MainActivity : AppCompatActivity() {
         btnPlayGame.setOnClickListener {
             val intent = Intent(this, GameActivity::class.java)
             startActivity(intent)
+        }
+
+        supportFragmentManager.commit {
+            replace(R.id.fragment_container, RankingFragment())
+            setReorderingAllowed(true)
         }
     }
 }
