@@ -15,7 +15,6 @@ class StartActivity : AppCompatActivity() {
 
         val btnPlay = findViewById<Button>(R.id.btnPlay)
 
-        // Al hacer clic en PLAY, vamos a la MainActivity
         btnPlay.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)

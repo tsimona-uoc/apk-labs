@@ -20,8 +20,7 @@ class GameManager(initialCoins: Int = 125) {
     var currentBet: Int = 10
         private set
 
-    // Representa el índice del icono en cada uno de los 3 rodillos
-    var currentSlots: IntArray = intArrayOf(1, 1, 1) // Empieza con tres "Sietes"
+    var currentSlots: IntArray = intArrayOf(1, 1, 1)
         private set
 
     fun increaseBet() {
@@ -41,7 +40,6 @@ class GameManager(initialCoins: Int = 125) {
 
         coins -= currentBet
 
-        // Generamos 3 índices aleatorios basados en la cantidad de iconos
         currentSlots = intArrayOf(
             Random.nextInt(icons.size),
             Random.nextInt(icons.size),
@@ -54,7 +52,7 @@ class GameManager(initialCoins: Int = 125) {
         if (currentBet > coins && coins >= 10) {
             currentBet = (coins / 10) * 10
         } else if (coins < 10 && coins > 0) {
-            currentBet = coins // Apuesta lo que le queda si es menos de 10
+            currentBet = coins
         } else if (coins == 0) {
             currentBet = 0
         }
@@ -65,7 +63,7 @@ class GameManager(initialCoins: Int = 125) {
     private fun calculateWinnings(): Int {
         val (s1, s2, s3) = currentSlots
         
-        // Lógica de premios basada en la rareza (el índice 0 es el más raro)
+
         return when {
             // TRES IGUALES (Premios mayores)
             s1 == s2 && s2 == s3 -> {
@@ -81,7 +79,7 @@ class GameManager(initialCoins: Int = 125) {
                 currentBet * multiplier
             }
             
-            // DOS IGUALES (Premio de consolación)
+            // DOS IGUALES
             s1 == s2 || s2 == s3 || s1 == s3 -> {
                 // Si hay dos iguales, devolvemos el doble de la apuesta
                 currentBet * 2
@@ -91,7 +89,6 @@ class GameManager(initialCoins: Int = 125) {
         }
     }
 
-    // Función de utilidad para obtener el ID del recurso drawable actual
     fun getDrawableId(slotIndex: Int): Int {
         return icons[currentSlots[slotIndex]]
     }
