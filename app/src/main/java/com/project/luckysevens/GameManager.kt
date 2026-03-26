@@ -49,6 +49,17 @@ class GameManager(initialCoins: Int = 125) {
         val winnings = calculateWinnings()
         coins += winnings
 
+        normalizeBetToCoins()
+
+        return winnings
+    }
+
+    fun setCoins(newCoins: Int) {
+        coins = newCoins.coerceAtLeast(0)
+        normalizeBetToCoins()
+    }
+
+    private fun normalizeBetToCoins() {
         if (currentBet > coins && coins >= 10) {
             currentBet = (coins / 10) * 10
         } else if (coins < 10 && coins > 0) {
@@ -56,8 +67,6 @@ class GameManager(initialCoins: Int = 125) {
         } else if (coins == 0) {
             currentBet = 0
         }
-
-        return winnings
     }
 
     private fun calculateWinnings(): Int {
