@@ -10,12 +10,17 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import com.project.luckysevens.data.AppDatabase
+import com.project.luckysevens.data.ScoreDao
+import com.project.luckysevens.data.ScoreEntity
+import java.util.concurrent.Executors
 import kotlin.random.Random
 
 class GameActivity : AppCompatActivity() {
 
     private lateinit var gameManager: GameManager
-    
+    private lateinit var scoreDao: ScoreDao
+
     private lateinit var tvCoins: TextView
     private lateinit var tvBetAmount: TextView
     private lateinit var slot1: ImageView
@@ -26,6 +31,8 @@ class GameActivity : AppCompatActivity() {
     private lateinit var btnTogglePaytable: Button
 
     private val handler = Handler(Looper.getMainLooper())
+    private val dbExecutor = Executors.newSingleThreadExecutor()
+    private val username = "Jugador"
     private var isSpinning = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +42,7 @@ class GameActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         gameManager = GameManager()
+        scoreDao = AppDatabase.getInstance(applicationContext).scoreDao()
 
         // Vincular vistas
         tvCoins = findViewById(R.id.tvCoinsGame)
@@ -45,12 +53,13 @@ class GameActivity : AppCompatActivity() {
         btnSpin = findViewById(R.id.btnSpin)
         paytableCard = findViewById(R.id.paytableCard)
         btnTogglePaytable = findViewById(R.id.btnTogglePaytable)
-        
+
         val btnBack = findViewById<TextView>(R.id.btnBack)
         val btnMinus = findViewById<TextView>(R.id.btnMinus)
         val btnPlus = findViewById<TextView>(R.id.btnPlus)
 
         updateUI()
+        loadSavedScore()
 
         btnBack.setOnClickListener { finish() }
 
@@ -90,7 +99,7 @@ class GameActivity : AppCompatActivity() {
     private fun startSpinAnimation() {
         isSpinning = true
         btnSpin.isEnabled = false
-        
+
         val duration = 1500L
         val interval = 100L
         val startTime = System.currentTimeMillis()
@@ -98,26 +107,27 @@ class GameActivity : AppCompatActivity() {
         val runnable = object : Runnable {
             override fun run() {
                 val elapsed = System.currentTimeMillis() - startTime
-                
+
                 if (elapsed < duration) {
                     slot1.setImageResource(gameManager.icons[Random.nextInt(gameManager.icons.size)])
                     slot2.setImageResource(gameManager.icons[Random.nextInt(gameManager.icons.size)])
                     slot3.setImageResource(gameManager.icons[Random.nextInt(gameManager.icons.size)])
-                    
+
                     handler.postDelayed(this, interval)
                 } else {
                     val winnings = gameManager.spin()
                     updateUI()
+                    saveScore(gameManager.coins)
                     isSpinning = false
                     btnSpin.isEnabled = true
-                    
+
                     if (winnings > 0) {
                         Toast.makeText(this@GameActivity, "¡GANASTE $winnings MONEDAS! 🎉", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
-        
+
         handler.post(runnable)
     }
 
@@ -128,5 +138,36 @@ class GameActivity : AppCompatActivity() {
         slot1.setImageResource(gameManager.getDrawableId(0))
         slot2.setImageResource(gameManager.getDrawableId(1))
         slot3.setImageResource(gameManager.getDrawableId(2))
+    }
+
+    private fun loadSavedScore() {
+        dbExecutor.execute {
+            val savedScore = scoreDao.getScoreByUsername(username)?.score
+            if (savedScore != null) {
+                runOnUiThread {
+                    gameManager.setCoins(savedScore)
+                    updateUI()
+                }
+            } else {
+                saveScore(gameManager.coins)
+            }
+        }
+    }
+
+    private fun saveScore(score: Int) {
+        dbExecutor.execute {
+            scoreDao.upsertScore(
+                ScoreEntity(
+                    username = username,
+                    score = score,
+                    updatedAt = System.currentTimeMillis()
+                )
+            )
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dbExecutor.shutdown()
     }
 }
