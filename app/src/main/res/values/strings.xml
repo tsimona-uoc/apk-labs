@@ -14,4 +14,9 @@
     <string name="icon_settings">⚙️</string>
     <string name="icon_ranking">⭐</string>
     <string name="icon_music">🔊</string>
+
+    <!-- Daily Reward -->
+    <string name="daily_reward_title">¡Felicidades!</string>
+    <string name="daily_reward_message">¡RECOMPENSA DIARIA!\nHas recibido %d monedas por iniciar sesión hoy. 🎰✨</string>
+    <string name="daily_reward_button">¡GENIAL!</string>
 </resources>
