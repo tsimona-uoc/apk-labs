@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.commit
 import com.project.luckysevens.data.AppDatabase
-import com.project.luckysevens.data.ScoreDao
 import com.project.luckysevens.data.ScoreEntity
 import com.project.luckysevens.fragments.ranking.RankingFragment
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -22,10 +21,11 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.project.luckysevens.data.ScoreRepository
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var scoreDao: ScoreDao
+    private lateinit var scoreRepository: ScoreRepository
     private val disposables = CompositeDisposable()
     private val username = "Jugador"
     private var currentScoreEntity: ScoreEntity? = null
@@ -37,7 +37,9 @@ class MainActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
 
-        scoreDao = AppDatabase.getInstance(applicationContext).scoreDao()
+        scoreRepository = ScoreRepository(
+            AppDatabase.getInstance(applicationContext).scoreDao()
+        )
 
         tvCoins = findViewById(R.id.tvCoins)
         val btnPlayGame = findViewById<Button>(R.id.btnPlayGame)
@@ -87,13 +89,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun ensureInitialScore() {
-        val disposable = scoreDao.getScoreByUsername(username)
+        val disposable = scoreRepository.ensurePlayerExists(username, 125)
             .subscribeOn(Schedulers.io())
-            .switchIfEmpty(
-                scoreDao.upsertScore(
-                    ScoreEntity(username = username, score = 125)
-                ).andThen(scoreDao.getScoreByUsername(username))
-            )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { entity ->
@@ -108,7 +105,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observePlayerScore() {
-        val disposable = scoreDao.observeScoreByUsername(username)
+        val disposable = scoreRepository.observePlayerScore(username)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -138,20 +135,8 @@ class MainActivity : AppCompatActivity() {
         if (lastRewardDate != currentDate) {
             val rewardAmount = 50
 
-            val disposable = scoreDao.getScoreByUsername(username)
+            val disposable = scoreRepository.addReward(username, rewardAmount, 125)
                 .subscribeOn(Schedulers.io())
-                .switchIfEmpty(
-                    scoreDao.upsertScore(
-                        ScoreEntity(username = username, score = 125)
-                    ).andThen(scoreDao.getScoreByUsername(username))
-                )
-                .flatMapCompletable { entity ->
-                    val updatedEntity = entity.copy(
-                        score = entity.score + rewardAmount,
-                        updatedAt = System.currentTimeMillis()
-                    )
-                    scoreDao.upsertScore(updatedEntity)
-                }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     {

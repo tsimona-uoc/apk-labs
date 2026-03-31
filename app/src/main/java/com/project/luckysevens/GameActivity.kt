@@ -11,18 +11,16 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.project.luckysevens.data.AppDatabase
-import com.project.luckysevens.data.ScoreDao
-import com.project.luckysevens.data.ScoreEntity
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlin.random.Random
+import com.project.luckysevens.data.ScoreRepository
 
 class GameActivity : AppCompatActivity() {
 
     private lateinit var gameManager: GameManager
-    private lateinit var scoreDao: ScoreDao
-
+    private lateinit var scoreRepository: ScoreRepository
     private lateinit var tvCoins: TextView
     private lateinit var tvBetAmount: TextView
     private lateinit var slot1: ImageView
@@ -44,7 +42,9 @@ class GameActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         gameManager = GameManager()
-        scoreDao = AppDatabase.getInstance(applicationContext).scoreDao()
+        scoreRepository = ScoreRepository(
+            AppDatabase.getInstance(applicationContext).scoreDao()
+        )
 
         tvCoins = findViewById(R.id.tvCoinsGame)
         tvBetAmount = findViewById(R.id.tvBetAmount)
@@ -143,7 +143,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun loadSavedScore() {
-        val disposable = scoreDao.getScoreByUsername(username)
+        val disposable = scoreRepository.getPlayerScore(username)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -163,13 +163,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun saveScore(score: Int) {
-        val disposable = scoreDao.upsertScore(
-            ScoreEntity(
-                username = username,
-                score = score,
-                updatedAt = System.currentTimeMillis()
-            )
-        )
+        val disposable = scoreRepository.savePlayerScore(username, score)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
