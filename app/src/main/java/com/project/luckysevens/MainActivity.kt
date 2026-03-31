@@ -16,15 +16,20 @@ import com.project.luckysevens.data.AppDatabase
 import com.project.luckysevens.data.ScoreDao
 import com.project.luckysevens.data.ScoreEntity
 import com.project.luckysevens.fragments.ranking.RankingFragment
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.text.SimpleDateFormat
-import java.util.*
-import java.util.concurrent.Executors
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var scoreDao: ScoreDao
-    private val dbExecutor = Executors.newSingleThreadExecutor()
+    private val disposables = CompositeDisposable()
+    private val username = "Jugador"
     private var currentScoreEntity: ScoreEntity? = null
+    private lateinit var tvCoins: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,27 +39,18 @@ class MainActivity : AppCompatActivity() {
 
         scoreDao = AppDatabase.getInstance(applicationContext).scoreDao()
 
-        val tvCoins = findViewById<TextView>(R.id.tvCoins)
+        tvCoins = findViewById(R.id.tvCoins)
         val btnPlayGame = findViewById<Button>(R.id.btnPlayGame)
         val btnMenu = findViewById<TextView>(R.id.btnMenu)
         val sideMenuCard = findViewById<CardView>(R.id.sideMenuCard)
-        
+
         val menuSettings = findViewById<LinearLayout>(R.id.menuSettings)
         val menuRanking = findViewById<LinearLayout>(R.id.menuRanking)
         val menuMusic = findViewById<LinearLayout>(R.id.menuMusic)
 
-        // Cargar monedas desde la base de datos
-        dbExecutor.execute {
-            val entity = scoreDao.getScoreByUsername("Jugador")
-                ?: scoreDao.upsertAndGet(ScoreEntity(username = "Jugador", score = 125))
-            
-            currentScoreEntity = entity
-            
-            runOnUiThread {
-                updateCoinsUI(tvCoins, entity.score)
-                checkDailyReward(tvCoins)
-            }
-        }
+        ensureInitialScore()
+        observePlayerScore()
+        checkDailyReward()
 
         btnPlayGame.setOnClickListener {
             val intent = Intent(this, GameActivity::class.java)
@@ -62,7 +58,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnMenu.setOnClickListener {
-            sideMenuCard.visibility = if (sideMenuCard.visibility == View.GONE) View.VISIBLE else View.GONE
+            sideMenuCard.visibility =
+                if (sideMenuCard.visibility == View.GONE) View.VISIBLE else View.GONE
         }
 
         menuSettings.setOnClickListener {
@@ -89,36 +86,84 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateCoinsUI(tvCoins: TextView, amount: Int) {
+    private fun ensureInitialScore() {
+        val disposable = scoreDao.getScoreByUsername(username)
+            .subscribeOn(Schedulers.io())
+            .switchIfEmpty(
+                scoreDao.upsertScore(
+                    ScoreEntity(username = username, score = 125)
+                ).andThen(scoreDao.getScoreByUsername(username))
+            )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { entity ->
+                    currentScoreEntity = entity
+                },
+                { error ->
+                    error.printStackTrace()
+                }
+            )
+
+        disposables.add(disposable)
+    }
+
+    private fun observePlayerScore() {
+        val disposable = scoreDao.observeScoreByUsername(username)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { entity ->
+                    currentScoreEntity = entity
+                    updateCoinsUI(entity.score)
+                },
+                { error ->
+                    error.printStackTrace()
+                }
+            )
+
+        disposables.add(disposable)
+    }
+
+    private fun updateCoinsUI(amount: Int) {
         tvCoins.text = getString(R.string.coins_label, amount)
     }
 
-    private fun checkDailyReward(tvCoins: TextView) {
+    private fun checkDailyReward() {
         val prefs = getSharedPreferences("LuckySevensPrefs", Context.MODE_PRIVATE)
         val lastRewardDate = prefs.getString("last_reward_date", "")
-        
+
         val sdf = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
         val currentDate = sdf.format(Date())
 
         if (lastRewardDate != currentDate) {
             val rewardAmount = 50
-            
-            dbExecutor.execute {
-                val entity = currentScoreEntity ?: scoreDao.getScoreByUsername("Jugador")
-                if (entity != null) {
-                    val newScore = entity.score + rewardAmount
-                    val updatedEntity = ScoreEntity(username = entity.username, score = newScore)
+
+            val disposable = scoreDao.getScoreByUsername(username)
+                .subscribeOn(Schedulers.io())
+                .switchIfEmpty(
+                    scoreDao.upsertScore(
+                        ScoreEntity(username = username, score = 125)
+                    ).andThen(scoreDao.getScoreByUsername(username))
+                )
+                .flatMapCompletable { entity ->
+                    val updatedEntity = entity.copy(
+                        score = entity.score + rewardAmount,
+                        updatedAt = System.currentTimeMillis()
+                    )
                     scoreDao.upsertScore(updatedEntity)
-                    currentScoreEntity = updatedEntity
-                    
-                    runOnUiThread {
-                        updateCoinsUI(tvCoins, newScore)
-                        showRewardDialog(rewardAmount)
-                    }
                 }
-            }
-            
-            prefs.edit().putString("last_reward_date", currentDate).apply()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    {
+                        prefs.edit().putString("last_reward_date", currentDate).apply()
+                        showRewardDialog(rewardAmount)
+                    },
+                    { error ->
+                        error.printStackTrace()
+                    }
+                )
+
+            disposables.add(disposable)
         }
     }
 
@@ -132,7 +177,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        disposables.clear()
         super.onDestroy()
-        dbExecutor.shutdown()
     }
 }

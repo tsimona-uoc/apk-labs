@@ -58,7 +58,7 @@
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:cardBackgroundColor="#F3E5F5"
         app:cardCornerRadius="40dp"
         app:cardElevation="8dp"

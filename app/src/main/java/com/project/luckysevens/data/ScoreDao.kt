@@ -4,21 +4,20 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Maybe
 
 @Dao
 interface ScoreDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun upsertScore(score: ScoreEntity): Long
+    fun upsertScore(score: ScoreEntity): Completable
 
     @Query("SELECT * FROM user_scores WHERE username = :username LIMIT 1")
-    fun getScoreByUsername(username: String): ScoreEntity?
+    fun getScoreByUsername(username: String): Maybe<ScoreEntity>
 
-    @Transaction
-    fun upsertAndGet(score: ScoreEntity): ScoreEntity {
-        upsertScore(score)
-        return getScoreByUsername(score.username) ?: score
-    }
+    @Query("SELECT * FROM user_scores WHERE username = :username LIMIT 1")
+    fun observeScoreByUsername(username: String): Flowable<ScoreEntity>
 }
 

@@ -13,7 +13,9 @@ import androidx.cardview.widget.CardView
 import com.project.luckysevens.data.AppDatabase
 import com.project.luckysevens.data.ScoreDao
 import com.project.luckysevens.data.ScoreEntity
-import java.util.concurrent.Executors
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlin.random.Random
 
 class GameActivity : AppCompatActivity() {
@@ -31,7 +33,7 @@ class GameActivity : AppCompatActivity() {
     private lateinit var btnTogglePaytable: Button
 
     private val handler = Handler(Looper.getMainLooper())
-    private val dbExecutor = Executors.newSingleThreadExecutor()
+    private val disposables = CompositeDisposable()
     private val username = "Jugador"
     private var isSpinning = false
 
@@ -44,7 +46,6 @@ class GameActivity : AppCompatActivity() {
         gameManager = GameManager()
         scoreDao = AppDatabase.getInstance(applicationContext).scoreDao()
 
-        // Vincular vistas
         tvCoins = findViewById(R.id.tvCoinsGame)
         tvBetAmount = findViewById(R.id.tvBetAmount)
         slot1 = findViewById(R.id.slot1)
@@ -88,11 +89,8 @@ class GameActivity : AppCompatActivity() {
         }
 
         btnTogglePaytable.setOnClickListener {
-            if (paytableCard.visibility == View.GONE) {
-                paytableCard.visibility = View.VISIBLE
-            } else {
-                paytableCard.visibility = View.GONE
-            }
+            paytableCard.visibility =
+                if (paytableCard.visibility == View.GONE) View.VISIBLE else View.GONE
         }
     }
 
@@ -122,7 +120,11 @@ class GameActivity : AppCompatActivity() {
                     btnSpin.isEnabled = true
 
                     if (winnings > 0) {
-                        Toast.makeText(this@GameActivity, "¡GANASTE $winnings MONEDAS! 🎉", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@GameActivity,
+                            "¡GANASTE $winnings MONEDAS! 🎉",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -134,40 +136,54 @@ class GameActivity : AppCompatActivity() {
     private fun updateUI() {
         tvCoins.text = "Coins: ${gameManager.coins}"
         tvBetAmount.text = "${gameManager.currentBet} COINS"
-        
+
         slot1.setImageResource(gameManager.getDrawableId(0))
         slot2.setImageResource(gameManager.getDrawableId(1))
         slot3.setImageResource(gameManager.getDrawableId(2))
     }
 
     private fun loadSavedScore() {
-        dbExecutor.execute {
-            val savedScore = scoreDao.getScoreByUsername(username)?.score
-            if (savedScore != null) {
-                runOnUiThread {
-                    gameManager.setCoins(savedScore)
+        val disposable = scoreDao.getScoreByUsername(username)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { savedScore ->
+                    gameManager.setCoins(savedScore.score)
                     updateUI()
+                },
+                { error ->
+                    error.printStackTrace()
+                },
+                {
+                    saveScore(gameManager.coins)
                 }
-            } else {
-                saveScore(gameManager.coins)
-            }
-        }
+            )
+
+        disposables.add(disposable)
     }
 
     private fun saveScore(score: Int) {
-        dbExecutor.execute {
-            scoreDao.upsertScore(
-                ScoreEntity(
-                    username = username,
-                    score = score,
-                    updatedAt = System.currentTimeMillis()
-                )
+        val disposable = scoreDao.upsertScore(
+            ScoreEntity(
+                username = username,
+                score = score,
+                updatedAt = System.currentTimeMillis()
             )
-        }
+        )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { },
+                { error ->
+                    error.printStackTrace()
+                }
+            )
+
+        disposables.add(disposable)
     }
 
     override fun onDestroy() {
+        disposables.clear()
         super.onDestroy()
-        dbExecutor.shutdown()
     }
 }
