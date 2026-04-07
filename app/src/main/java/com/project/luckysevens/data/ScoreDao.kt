@@ -19,5 +19,13 @@ interface ScoreDao {
 
     @Query("SELECT * FROM user_scores WHERE username = :username LIMIT 1")
     fun observeScoreByUsername(username: String): Flowable<ScoreEntity>
-}
 
+    @Query("SELECT * FROM user_scores ORDER BY score DESC")
+    fun getAllScoresOrdered(): Flowable<List<ScoreEntity>>
+
+    @Insert
+    fun insertGameResult(result: GameResultEntity): Completable
+
+    @Query("SELECT * FROM game_history WHERE username = :username ORDER BY date DESC")
+    fun getHistoryByUsername(username: String): Flowable<List<GameResultEntity>>
+}

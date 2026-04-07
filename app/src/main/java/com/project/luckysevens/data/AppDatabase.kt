@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [ScoreEntity::class], version = 1, exportSchema = false)
+@Database(entities = [ScoreEntity::class, GameResultEntity::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun scoreDao(): ScoreDao
@@ -20,7 +20,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "lucky_sevens.db"
-                ).build().also { INSTANCE = it }
+                )
+                .fallbackToDestructiveMigration(false)
+                .build().also { INSTANCE = it }
             }
         }
     }

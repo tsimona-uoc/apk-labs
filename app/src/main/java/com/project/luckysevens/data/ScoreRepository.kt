@@ -40,4 +40,22 @@ class ScoreRepository(
                 savePlayerScore(username, entity.score + rewardAmount)
             }
     }
+
+    fun getRanking(): Flowable<List<ScoreEntity>> {
+        return scoreDao.getAllScoresOrdered()
+    }
+
+    fun saveGameResult(username: String, bet: Int, winnings: Int): Completable {
+        return scoreDao.insertGameResult(
+            GameResultEntity(
+                username = username,
+                bet = bet,
+                winnings = winnings
+            )
+        )
+    }
+
+    fun getGameHistory(username: String): Flowable<List<GameResultEntity>> {
+        return scoreDao.getHistoryByUsername(username)
+    }
 }
