@@ -60,4 +60,5 @@ dependencies {
 
     // Fragments
     implementation("androidx.fragment:fragment-ktx:1.8.9")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 }

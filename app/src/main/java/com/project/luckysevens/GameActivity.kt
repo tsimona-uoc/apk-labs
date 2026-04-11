@@ -16,6 +16,16 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlin.random.Random
 import com.project.luckysevens.data.ScoreRepository
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.provider.CalendarContract
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationServices
+import com.project.luckysevens.data.VictoryLocationRepository
+import java.util.Calendar
+
 
 class GameActivity : AppCompatActivity() {
 
@@ -35,6 +45,25 @@ class GameActivity : AppCompatActivity() {
     private val username = "Jugador"
     private var isSpinning = false
 
+    private lateinit var victoryLocationRepository: VictoryLocationRepository
+    private lateinit var fusedLocationClient: com.google.android.gms.location.FusedLocationProviderClient
+
+    private val locationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                handleVictoryWithLocation()
+            } else {
+                Toast.makeText(
+                    this,
+                    "No se ha concedido el permiso de ubicación",
+                    Toast.LENGTH_SHORT
+                ).show()
+                openCalendarEventWithoutLocation()
+            }
+        }
+
+    private var pendingVictoryCoins: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
@@ -45,6 +74,12 @@ class GameActivity : AppCompatActivity() {
         scoreRepository = ScoreRepository(
             AppDatabase.getInstance(applicationContext).scoreDao()
         )
+
+        victoryLocationRepository = VictoryLocationRepository(
+            AppDatabase.getInstance(applicationContext).victoryLocationDao()
+        )
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         tvCoins = findViewById(R.id.tvCoinsGame)
         tvBetAmount = findViewById(R.id.tvBetAmount)
@@ -116,6 +151,12 @@ class GameActivity : AppCompatActivity() {
                     val winnings = gameManager.spin()
                     updateUI()
                     saveScore(gameManager.coins)
+
+                    if (hasSpecialRubyVictory()) {
+                        pendingVictoryCoins = gameManager.coins
+                        checkLocationPermissionAndHandleVictory()
+                    }
+
                     isSpinning = false
                     btnSpin.isEnabled = true
 
@@ -174,6 +215,149 @@ class GameActivity : AppCompatActivity() {
             )
 
         disposables.add(disposable)
+    }
+
+    private fun hasSpecialRubyVictory(): Boolean {
+        val rubyDrawable = R.drawable.ic_rubi
+
+        var rubyCount = 0
+
+        if (gameManager.getDrawableId(0) == rubyDrawable) rubyCount++
+        if (gameManager.getDrawableId(1) == rubyDrawable) rubyCount++
+        if (gameManager.getDrawableId(2) == rubyDrawable) rubyCount++
+
+        return rubyCount >= 2
+    }
+
+    private fun checkLocationPermissionAndHandleVictory() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                handleVictoryWithLocation()
+            }
+
+            else -> {
+                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        }
+    }
+
+    private fun handleVictoryWithLocation() {
+        if (
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            openCalendarEventWithoutLocation()
+            return
+        }
+
+        try {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location ->
+                    if (location != null) {
+                        saveVictoryLocationAndOpenCalendar(
+                            latitude = location.latitude,
+                            longitude = location.longitude
+                        )
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "No se pudo obtener la ubicación actual",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        openCalendarEventWithoutLocation()
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(
+                        this,
+                        "Error al obtener la ubicación",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    openCalendarEventWithoutLocation()
+                }
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+            openCalendarEventWithoutLocation()
+        }
+    }
+
+    private fun saveVictoryLocationAndOpenCalendar(latitude: Double, longitude: Double) {
+        val eventTitle = "Victoria Lucky Sevens"
+        val victoryType = "DOUBLE_RUBY_WIN"
+
+        val disposable = victoryLocationRepository.saveVictoryLocation(
+            username = username,
+            latitude = latitude,
+            longitude = longitude,
+            victoryType = victoryType,
+            coinsAfterWin = pendingVictoryCoins,
+            calendarEventTitle = eventTitle
+        )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                {
+                    openCalendarEventWithLocation(eventTitle, latitude, longitude)
+                },
+                { error ->
+                    error.printStackTrace()
+                    openCalendarEventWithLocation(eventTitle, latitude, longitude)
+                }
+            )
+
+        disposables.add(disposable)
+    }
+
+    private fun openCalendarEventWithLocation(
+        title: String,
+        latitude: Double,
+        longitude: Double
+    ) {
+        val beginTime = Calendar.getInstance().apply {
+            add(Calendar.MINUTE, 5)
+        }
+
+        val endTime = Calendar.getInstance().apply {
+            add(Calendar.MINUTE, 35)
+        }
+
+        val locationText = "Lat: $latitude, Lon: $longitude"
+
+        val intent = Intent(Intent.ACTION_INSERT).apply {
+            data = CalendarContract.Events.CONTENT_URI
+            putExtra(CalendarContract.Events.TITLE, title)
+            putExtra(CalendarContract.Events.DESCRIPTION, "Victoria especial con 2 o más rubíes")
+            putExtra(CalendarContract.Events.EVENT_LOCATION, locationText)
+            putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.timeInMillis)
+            putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.timeInMillis)
+        }
+
+        startActivity(intent)
+    }
+
+    private fun openCalendarEventWithoutLocation() {
+        val beginTime = Calendar.getInstance().apply {
+            add(Calendar.MINUTE, 5)
+        }
+
+        val endTime = Calendar.getInstance().apply {
+            add(Calendar.MINUTE, 35)
+        }
+
+        val intent = Intent(Intent.ACTION_INSERT).apply {
+            data = CalendarContract.Events.CONTENT_URI
+            putExtra(CalendarContract.Events.TITLE, "Victoria Lucky Sevens")
+            putExtra(CalendarContract.Events.DESCRIPTION, "Victoria especial con 2 o más rubíes")
+            putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.timeInMillis)
+            putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.timeInMillis)
+        }
+
+        startActivity(intent)
     }
 
     override fun onDestroy() {
