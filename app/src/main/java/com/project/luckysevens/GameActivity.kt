@@ -169,6 +169,7 @@ class GameActivity : AppCompatActivity() {
         isSpinning = true
         btnSpin.isEnabled = false
 
+        val currentBet = gameManager.currentBet
         val winnings = gameManager.spin()
         val targetIcons = IntArray(3) { gameManager.getDrawableId(it) }
         val finalCoins = gameManager.coins
@@ -206,7 +207,14 @@ class GameActivity : AppCompatActivity() {
                     handler.postDelayed(this, 80)
                 } else {
                     tvCoins.text = "Coins: $finalCoins"
-                    saveScore(finalCoins)
+
+                    val disposable = scoreRepository.savePlayerScore(username, finalCoins)
+                        .andThen(scoreRepository.saveGameResult(username, currentBet, winnings))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({}, { it.printStackTrace() })
+                    disposables.add(disposable)
+                    // ----------------------------------------------
 
                     val isSpecialWin = hasSpecialRubyVictory()
 
