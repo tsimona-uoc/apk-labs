@@ -1,30 +1,43 @@
 package com.project.luckysevens
 
+import android.Manifest
+import android.content.ContentValues
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.media.AudioAttributes
+import android.media.SoundPool
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.CalendarContract
+import android.provider.MediaStore
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import com.project.luckysevens.data.AppDatabase
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlin.random.Random
-import com.project.luckysevens.data.ScoreRepository
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.provider.CalendarContract
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
+import com.project.luckysevens.data.AppDatabase
+import com.project.luckysevens.data.ScoreRepository
 import com.project.luckysevens.data.VictoryLocationRepository
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import java.io.OutputStream
 import java.util.Calendar
+import kotlin.random.Random
 
 
 class GameActivity : AppCompatActivity() {
@@ -44,6 +57,12 @@ class GameActivity : AppCompatActivity() {
     private val disposables = CompositeDisposable()
     private val username = "Jugador"
     private var isSpinning = false
+    private var soundPool: SoundPool? = null
+    private var soundSpin: Int = 0
+    private var soundWin: Int = 0
+    private var soundStop: Int = 0
+    private var soundBigWin: Int = 0
+    private var spinStreamId: Int = 0
 
     private lateinit var victoryLocationRepository: VictoryLocationRepository
     private lateinit var fusedLocationClient: com.google.android.gms.location.FusedLocationProviderClient
@@ -69,6 +88,7 @@ class GameActivity : AppCompatActivity() {
         setContentView(R.layout.activity_game)
 
         supportActionBar?.hide()
+        initSoundPool()
 
         gameManager = GameManager()
         scoreRepository = ScoreRepository(
@@ -129,38 +149,87 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+    private fun initSoundPool() {
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_GAME)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        soundPool = SoundPool.Builder()
+            .setMaxStreams(5)
+            .setAudioAttributes(audioAttributes)
+            .build()
+
+        soundSpin = soundPool?.load(this, R.raw.slot_spin, 1) ?: 0
+        soundWin = soundPool?.load(this, R.raw.win_sound, 1) ?: 0
+        soundStop = soundPool?.load(this, R.raw.slot_stop, 1) ?: 0
+        soundBigWin = soundPool?.load(this, R.raw.big_win, 1) ?: 0
+    }
+
     private fun startSpinAnimation() {
         isSpinning = true
         btnSpin.isEnabled = false
 
-        val duration = 1500L
-        val interval = 100L
+        val winnings = gameManager.spin()
+        val targetIcons = IntArray(3) { gameManager.getDrawableId(it) }
+        val finalCoins = gameManager.coins
+
+        if (soundSpin != 0) {
+            spinStreamId = soundPool?.play(soundSpin, 1f, 1f, 1, 0, 1f) ?: 0
+        }
+
         val startTime = System.currentTimeMillis()
+        val slots = listOf(slot1, slot2, slot3)
+        val stopTimes = listOf(1000L, 1700L, 2400L) 
+        val stopped = BooleanArray(3) { false }
 
         val runnable = object : Runnable {
             override fun run() {
                 val elapsed = System.currentTimeMillis() - startTime
+                var allStopped = true
 
-                if (elapsed < duration) {
-                    slot1.setImageResource(gameManager.icons[Random.nextInt(gameManager.icons.size)])
-                    slot2.setImageResource(gameManager.icons[Random.nextInt(gameManager.icons.size)])
-                    slot3.setImageResource(gameManager.icons[Random.nextInt(gameManager.icons.size)])
+                for (i in slots.indices) {
+                    if (elapsed < stopTimes[i]) {
+                        slots[i].setImageResource(gameManager.icons[Random.nextInt(gameManager.icons.size)])
+                        allStopped = false
+                    } else if (!stopped[i]) {
+                        stopped[i] = true
+                        slots[i].setImageResource(targetIcons[i])
+                        if (soundStop != 0) soundPool?.play(soundStop, 1f, 1f, 1, 0, 1f)
 
-                    handler.postDelayed(this, interval)
+                        if (i == slots.size - 1) {
+                            soundPool?.stop(spinStreamId)
+                        }
+                    }
+                }
+
+                if (!allStopped) {
+                    handler.postDelayed(this, 80)
                 } else {
-                    val winnings = gameManager.spin()
-                    updateUI()
-                    saveScore(gameManager.coins)
+                    tvCoins.text = "Coins: $finalCoins"
+                    saveScore(finalCoins)
 
-                    if (hasSpecialRubyVictory()) {
-                        pendingVictoryCoins = gameManager.coins
+                    val isSpecialWin = hasSpecialRubyVictory()
+
+                    if (isSpecialWin) {
+                        pendingVictoryCoins = finalCoins
                         checkLocationPermissionAndHandleVictory()
+                    }
+
+                    if (isSpecialWin || winnings >= 100) {
+                        saveVictoryScreenshot(winnings)
                     }
 
                     isSpinning = false
                     btnSpin.isEnabled = true
 
                     if (winnings > 0) {
+                        if (isSpecialWin && soundBigWin != 0) {
+                            soundPool?.play(soundBigWin, 1f, 1f, 1, 0, 1f)
+                        } else if (soundWin != 0) {
+                            soundPool?.play(soundWin, 1f, 1f, 1, 0, 1f)
+                        }
+
+                        animateWin()
                         Toast.makeText(
                             this@GameActivity,
                             "¡GANASTE $winnings MONEDAS! 🎉",
@@ -172,6 +241,73 @@ class GameActivity : AppCompatActivity() {
         }
 
         handler.post(runnable)
+    }
+
+    private fun saveVictoryScreenshot(winnings: Int) {
+        val rootView = window.decorView.rootView
+        val bitmap = Bitmap.createBitmap(rootView.width, rootView.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        rootView.draw(canvas)
+
+        val paint = Paint().apply {
+            color = Color.YELLOW
+            textSize = 80f
+            isFakeBoldText = true
+            textAlign = Paint.Align.CENTER // Centrar el texto
+            setShadowLayer(5f, 0f, 0f, Color.BLACK)
+        }
+
+        val text = "¡HAS GANADO $winnings MONEDAS!"
+        canvas.drawText(text, (bitmap.width / 2).toFloat(), bitmap.height - 100f, paint)
+
+        val disposable = Completable.fromAction {
+            val filename = "LuckySevens_Win_${System.currentTimeMillis()}.jpg"
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/LuckySevens")
+                }
+            }
+
+            val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            uri?.let {
+                val outputStream: OutputStream? = contentResolver.openOutputStream(it)
+                outputStream?.use { os ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)
+                }
+            }
+        }
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(
+            { Toast.makeText(this, "¡Captura de victoria guardada! 📸", Toast.LENGTH_SHORT).show() },
+            { error -> error.printStackTrace() }
+        )
+        disposables.add(disposable)
+    }
+
+    private fun animateWin() {
+        tvCoins.animate()
+            .scaleX(1.4f)
+            .scaleY(1.4f)
+            .translationX(-40f)
+            .setDuration(300)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .withEndAction {
+                tvCoins.animate().scaleX(1f).scaleY(1f).translationX(0f).setDuration(300).start()
+            }
+            .start()
+
+        val zoomSlot = { view: View ->
+            view.animate()
+                .scaleX(1.25f)
+                .scaleY(1.25f)
+                .setDuration(400)
+                .withEndAction { view.animate().scaleX(1f).scaleY(1f).setDuration(300).start() }
+                .start()
+        }
+        zoomSlot(slot1); zoomSlot(slot2); zoomSlot(slot3)
     }
 
     private fun updateUI() {
@@ -362,6 +498,8 @@ class GameActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         disposables.clear()
+        soundPool?.release()
+        soundPool = null
         super.onDestroy()
     }
 }
