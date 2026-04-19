@@ -37,6 +37,9 @@ class MainActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
 
+        // 🎵 Iniciar música global
+        MusicManager.loadMusic(this)
+
         scoreRepository = ScoreRepository(
             AppDatabase.getInstance(applicationContext).scoreDao()
         )
@@ -77,8 +80,10 @@ class MainActivity : AppCompatActivity() {
             sideMenuCard.visibility = View.GONE
         }
 
+        // 🎵 BOTÓN MUSIC → ahora abre la pantalla de configuración
         menuMusic.setOnClickListener {
-            Toast.makeText(this, "Music toggled", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, MusicSettingsActivity::class.java)
+            startActivity(intent)
             sideMenuCard.visibility = View.GONE
         }
 
@@ -159,6 +164,11 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(R.string.daily_reward_button) { dialog, _ -> dialog.dismiss() }
             .setCancelable(false)
             .show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MusicManager.resumeMusic()
     }
 
     override fun onDestroy() {

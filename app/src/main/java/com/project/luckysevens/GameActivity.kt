@@ -510,4 +510,9 @@ class GameActivity : AppCompatActivity() {
         soundPool = null
         super.onDestroy()
     }
+
+    override fun onResume() {
+        super.onResume()
+        MusicManager.resumeMusic()
+    }
 }
