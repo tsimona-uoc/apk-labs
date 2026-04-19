@@ -10,7 +10,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.media.AudioAttributes
 import android.media.SoundPool
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -81,7 +80,22 @@ class GameActivity : AppCompatActivity() {
             }
         }
 
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                sendPendingVictoryNotification()
+            } else {
+                Toast.makeText(
+                    this,
+                    getString(R.string.victory_notification_permission_denied),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
     private var pendingVictoryCoins: Int = 0
+    private var pendingNotificationWinnings: Int = 0
+    private var pendingNotificationTotalCoins: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,6 +103,7 @@ class GameActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
         initSoundPool()
+        NotificationHelper.createVictoryChannel(this)
 
         gameManager = GameManager()
         scoreRepository = ScoreRepository(
@@ -243,6 +258,7 @@ class GameActivity : AppCompatActivity() {
                             "¡GANASTE $winnings MONEDAS! 🎉",
                             Toast.LENGTH_SHORT
                         ).show()
+                        notifyVictory(winnings, finalCoins)
                     }
                 }
             }
@@ -386,6 +402,41 @@ class GameActivity : AppCompatActivity() {
                 locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }
+    }
+
+    private fun notifyVictory(winnings: Int, totalCoins: Int) {
+        pendingNotificationWinnings = winnings
+        pendingNotificationTotalCoins = totalCoins
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    sendPendingVictoryNotification()
+                }
+
+                else -> {
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        } else {
+            sendPendingVictoryNotification()
+        }
+    }
+
+    private fun sendPendingVictoryNotification() {
+        if (pendingNotificationWinnings <= 0) return
+
+        NotificationHelper.showVictoryNotification(
+            context = this,
+            winnings = pendingNotificationWinnings,
+            totalCoins = pendingNotificationTotalCoins
+        )
+
+        pendingNotificationWinnings = 0
+        pendingNotificationTotalCoins = 0
     }
 
     private fun handleVictoryWithLocation() {
