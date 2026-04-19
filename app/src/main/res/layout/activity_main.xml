@@ -6,52 +6,35 @@
     android:layout_height="match_parent"
     android:background="#4A148C">
 
-    <LinearLayout
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topBar"
         android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:background="#7B1FA2"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
+        android:layout_height="64dp"
+        android:background="@color/lucky_sevens_surface"
+        android:contentDescription="@string/action_toggle_menu"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        app:navigationContentDescription="@string/action_toggle_menu"
+        app:navigationIcon="@drawable/ic_menu_toolbar"
+        app:title="@string/title_lucky_sevens"
+        app:titleCentered="true"
+        app:titleTextColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/btnMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="48dp"
-            android:minHeight="48dp"
-            android:gravity="center"
-            android:text="@string/menu_icon"
-            android:textColor="#FFFFFF"
-            android:textSize="30sp"
-            android:padding="8dp"
-            android:clickable="true"
-            android:focusable="true"
-            tools:text="≡" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/title_lucky_sevens"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/tvCoins"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#FFD700"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="56dp"
+            android:background="@drawable/bg_coin_badge"
+            android:textColor="@color/lucky_sevens_gold"
             android:textSize="16sp"
             android:textStyle="bold"
             tools:text="Coins: 125" />
-    </LinearLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/sideMenuCard"
@@ -72,14 +55,6 @@
             android:orientation="vertical"
             android:paddingVertical="20dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/menu_icon"
-                android:textColor="#4A148C"
-                android:textSize="24sp"
-                android:layout_marginBottom="20dp"
-                tools:text="≡" />
 
             <LinearLayout
                 android:id="@+id/menuSettings"
@@ -136,6 +111,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
+                android:layout_marginBottom="20dp"
                 android:clickable="true"
                 android:focusable="true">
                 <TextView
@@ -151,6 +127,29 @@
                     android:textColor="#4A148C"
                     android:textSize="11sp"
                     tools:text="Music" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/menuHelp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/icon_help"
+                    android:textSize="24sp"
+                    tools:text="❓" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/menu_help"
+                    android:textColor="#4A148C"
+                    android:textSize="11sp"
+                    tools:text="Ayuda" />
             </LinearLayout>
 
         </LinearLayout>
