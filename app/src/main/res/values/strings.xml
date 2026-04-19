@@ -19,4 +19,7 @@
     <string name="daily_reward_title">¡Felicidades!</string>
     <string name="daily_reward_message">¡RECOMPENSA DIARIA!\nHas recibido %d monedas por iniciar sesión hoy. 🎰✨</string>
     <string name="daily_reward_button">¡GENIAL!</string>
+    <string name="victory_notification_title">¡Has ganado una partida!</string>
+    <string name="victory_notification_message">Has ganado %1$d monedas y ahora tienes %2$d monedas en total. ¡Sigue jugando!</string>
+    <string name="victory_notification_permission_denied">No se pudo mostrar la notificación de victoria porque no se concedió el permiso.</string>
 </resources>
