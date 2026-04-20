@@ -33,7 +33,17 @@ class HelpActivity : AppCompatActivity() {
             builtInZoomControls = false
             displayZoomControls = false
         }
-        helpWebView.loadUrl(HELP_URL)
+
+        // 🔥 Cargar HTML según idioma de la app
+        val language = LanguageManager.getLanguage(this)
+
+        val fileName = if (language == "es") {
+            "index_es.html"
+        } else {
+            "index_en.html"
+        }
+
+        helpWebView.loadUrl("file:///android_asset/help/$fileName")
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -50,10 +60,4 @@ class HelpActivity : AppCompatActivity() {
         super.onResume()
         MusicManager.resumeMusic()
     }
-
-    companion object {
-        private const val HELP_URL = "file:///android_asset/help/index.html"
-    }
 }
-
-

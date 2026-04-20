@@ -21,6 +21,11 @@ object LanguageManager {
         return updateContext(context, language)
     }
 
+    fun getLanguage(context: Context): String {
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_LANGUAGE, "es") ?: "es"
+    }
+
     private fun updateContext(context: Context, languageCode: String): Context {
         val locale = Locale(languageCode)
         Locale.setDefault(locale)
