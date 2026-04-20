@@ -12,6 +12,7 @@
     <string name="menu_settings">Ajustes</string>
     <string name="menu_ranking">Clasificación</string>
     <string name="menu_music">Música</string>
+    <string name="menu_help">Ayuda</string>
 
     <!-- Botones principales -->
     <string name="btn_play">😊 JUGAR</string>
@@ -24,6 +25,7 @@
     <string name="icon_settings">⚙️</string>
     <string name="icon_ranking">⭐</string>
     <string name="icon_music">🔊</string>
+    <string name="icon_help">❓</string>
 
     <!-- Daily Reward -->
     <string name="daily_reward_title">¡Felicidades!</string>
@@ -48,6 +50,18 @@
     <!-- Calendario -->
     <string name="victory_title">Victoria Lucky Sevens</string>
     <string name="victory_description">Victoria especial con 2 o más rubíes</string>
+
+    <!-- Notificaciones -->
+    <string name="victory_notification_title">¡Has ganado una partida!</string>
+    <string name="victory_notification_message">Has ganado %1$d monedas y ahora tienes %2$d monedas en total. ¡Sigue jugando!</string>
+    <string name="victory_notification_permission_denied">No se pudo mostrar la notificación de victoria porque no se concedió el permiso.</string>
+
+    <!-- Ayuda -->
+    <string name="help_title">Guía del juego</string>
+    <string name="help_webview_description">Contenido de ayuda del juego Lucky Sevens</string>
+    <string name="action_open_help">Abrir ayuda del juego</string>
+    <string name="action_toggle_menu">Abrir o cerrar menú lateral</string>
+    <string name="action_navigate_back">Volver a la pantalla anterior</string>
 
     <!-- Otros -->
     <string name="pair_multiplier">PAIR=x2</string>

@@ -81,7 +81,22 @@ class GameActivity : AppCompatActivity() {
             }
         }
 
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                sendPendingVictoryNotification()
+            } else {
+                Toast.makeText(
+                    this,
+                    getString(R.string.victory_notification_permission_denied),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
     private var pendingVictoryCoins: Int = 0
+    private var pendingNotificationWinnings: Int = 0
+    private var pendingNotificationTotalCoins: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,6 +104,7 @@ class GameActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
         initSoundPool()
+        NotificationHelper.createVictoryChannel(this)
 
         gameManager = GameManager()
         scoreRepository = ScoreRepository(
@@ -195,14 +211,14 @@ class GameActivity : AppCompatActivity() {
 
                 for (i in slots.indices) {
                     if (elapsed < stopTimes[i]) {
-                        slots[i].setImageResource(
-                            gameManager.icons.random()
-                        )
+                        slots[i].setImageResource(gameManager.icons.random())
                         allStopped = false
                     } else if (!stopped[i]) {
                         stopped[i] = true
                         slots[i].setImageResource(targetIcons[i])
-                        if (soundStop != 0) soundPool?.play(soundStop, 1f, 1f, 1, 0, 1f)
+
+                        if (soundStop != 0)
+                            soundPool?.play(soundStop, 1f, 1f, 1, 0, 1f)
 
                         if (i == slots.size - 1) {
                             soundPool?.stop(spinStreamId)
@@ -213,14 +229,44 @@ class GameActivity : AppCompatActivity() {
                 if (!allStopped) {
                     handler.postDelayed(this, 80)
                 } else {
+
                     updateUI()
 
+                    val disposable = scoreRepository.savePlayerScore(username, finalCoins)
+                        .andThen(scoreRepository.saveGameResult(username, currentBet, winnings))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({}, { it.printStackTrace() })
+
+                    disposables.add(disposable)
+
+                    val isSpecialWin = hasSpecialRubyVictory()
+
+                    if (isSpecialWin) {
+                        pendingVictoryCoins = finalCoins
+                        checkLocationPermissionAndHandleVictory()
+                    }
+
+                    if (isSpecialWin || winnings >= 100) {
+                        saveVictoryScreenshot(winnings)
+                    }
+
                     if (winnings > 0) {
+                        if (isSpecialWin && soundBigWin != 0) {
+                            soundPool?.play(soundBigWin, 1f, 1f, 1, 0, 1f)
+                        } else if (soundWin != 0) {
+                            soundPool?.play(soundWin, 1f, 1f, 1, 0, 1f)
+                        }
+
+                        animateWin()
+
                         Toast.makeText(
                             this@GameActivity,
                             getString(R.string.win_message, winnings),
                             Toast.LENGTH_SHORT
                         ).show()
+
+                        notifyVictory(winnings, finalCoins)
                     }
 
                     isSpinning = false
@@ -253,8 +299,128 @@ class GameActivity : AppCompatActivity() {
         disposables.add(disposable)
     }
 
+    private fun saveVictoryScreenshot(winnings: Int) {
+        val rootView = window.decorView.rootView
+        val bitmap = Bitmap.createBitmap(rootView.width, rootView.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        rootView.draw(canvas)
+
+        val paint = Paint().apply {
+            color = Color.YELLOW
+            textSize = 80f
+            isFakeBoldText = true
+            textAlign = Paint.Align.CENTER
+            setShadowLayer(5f, 0f, 0f, Color.BLACK)
+        }
+
+        val text = getString(R.string.win_message, winnings)
+        canvas.drawText(text, (bitmap.width / 2).toFloat(), bitmap.height - 100f, paint)
+
+        val disposable = Completable.fromAction {
+            val filename = "LuckySevens_Win_${System.currentTimeMillis()}.jpg"
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/LuckySevens")
+                }
+            }
+
+            val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            uri?.let {
+                val outputStream: OutputStream? = contentResolver.openOutputStream(it)
+                outputStream?.use { os ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)
+                }
+            }
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { Toast.makeText(this, getString(R.string.screenshot_saved), Toast.LENGTH_SHORT).show() },
+                { it.printStackTrace() }
+            )
+
+        disposables.add(disposable)
+    }
+
+    private fun animateWin() {
+        tvCoins.animate()
+            .scaleX(1.4f)
+            .scaleY(1.4f)
+            .translationX(-40f)
+            .setDuration(300)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .withEndAction {
+                tvCoins.animate().scaleX(1f).scaleY(1f).translationX(0f).setDuration(300).start()
+            }
+            .start()
+
+        val zoomSlot = { view: View ->
+            view.animate()
+                .scaleX(1.25f)
+                .scaleY(1.25f)
+                .setDuration(400)
+                .withEndAction { view.animate().scaleX(1f).scaleY(1f).setDuration(300).start() }
+                .start()
+        }
+
+        zoomSlot(slot1); zoomSlot(slot2); zoomSlot(slot3)
+    }
+
+    private fun hasSpecialRubyVictory(): Boolean {
+        val rubyDrawable = R.drawable.ic_rubi
+        var rubyCount = 0
+        if (gameManager.getDrawableId(0) == rubyDrawable) rubyCount++
+        if (gameManager.getDrawableId(1) == rubyDrawable) rubyCount++
+        if (gameManager.getDrawableId(2) == rubyDrawable) rubyCount++
+        return rubyCount >= 2
+    }
+
+    private fun checkLocationPermissionAndHandleVictory() {
+        when {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED -> {
+                handleVictoryWithLocation()
+            }
+            else -> {
+                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        }
+    }
+
+    private fun notifyVictory(winnings: Int, totalCoins: Int) {
+        pendingNotificationWinnings = winnings
+        pendingNotificationTotalCoins = totalCoins
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                sendPendingVictoryNotification()
+            } else {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            sendPendingVictoryNotification()
+        }
+    }
+
+    private fun sendPendingVictoryNotification() {
+        if (pendingNotificationWinnings <= 0) return
+
+        NotificationHelper.showVictoryNotification(
+            this,
+            pendingNotificationWinnings,
+            pendingNotificationTotalCoins
+        )
+
+        pendingNotificationWinnings = 0
+        pendingNotificationTotalCoins = 0
+    }
+
     private fun handleVictoryWithLocation() {
-        // (sin cambios relevantes aquí)
+        openCalendarEventWithoutLocation()
     }
 
     private fun openCalendarEventWithoutLocation() {

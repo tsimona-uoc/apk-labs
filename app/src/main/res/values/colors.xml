@@ -2,4 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="lucky_sevens_background">#4A148C</color>
+    <color name="lucky_sevens_surface">#7B1FA2</color>
+    <color name="lucky_sevens_surface_light">#F3E5F5</color>
+    <color name="lucky_sevens_surface_soft">#FAF5FF</color>
+    <color name="lucky_sevens_gold">#FFD700</color>
+    <color name="lucky_sevens_gold_dark">#C69214</color>
+    <color name="lucky_sevens_text_primary">#2F0A52</color>
+    <color name="lucky_sevens_text_secondary">#5E3A77</color>
 </resources>

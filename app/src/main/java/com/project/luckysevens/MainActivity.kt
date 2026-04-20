@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.commit
+import com.google.android.material.appbar.MaterialToolbar
 import com.project.luckysevens.data.AppDatabase
 import com.project.luckysevens.data.ScoreEntity
 import com.project.luckysevens.fragments.ranking.RankingFragment
@@ -43,14 +44,15 @@ class MainActivity : AppCompatActivity() {
             AppDatabase.getInstance(applicationContext).scoreDao()
         )
 
+        val topBar = findViewById<MaterialToolbar>(R.id.topBar)
         tvCoins = findViewById(R.id.tvCoins)
         val btnPlayGame = findViewById<Button>(R.id.btnPlayGame)
-        val btnMenu = findViewById<TextView>(R.id.btnMenu)
         val sideMenuCard = findViewById<CardView>(R.id.sideMenuCard)
 
         val menuSettings = findViewById<LinearLayout>(R.id.menuSettings)
         val menuRanking = findViewById<LinearLayout>(R.id.menuRanking)
         val menuMusic = findViewById<LinearLayout>(R.id.menuMusic)
+        val menuHelp = findViewById<LinearLayout>(R.id.menuHelp)
 
         ensureInitialScore()
         observePlayerScore()
@@ -60,7 +62,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, GameActivity::class.java))
         }
 
-        btnMenu.setOnClickListener {
+        topBar.setNavigationOnClickListener {
             sideMenuCard.visibility =
                 if (sideMenuCard.visibility == View.GONE) View.VISIBLE else View.GONE
         }
@@ -79,6 +81,12 @@ class MainActivity : AppCompatActivity() {
 
         menuMusic.setOnClickListener {
             startActivity(Intent(this, MusicSettingsActivity::class.java))
+            sideMenuCard.visibility = View.GONE
+        }
+
+        menuHelp.setOnClickListener {
+            val intent = Intent(this, HelpActivity::class.java)
+            startActivity(intent)
             sideMenuCard.visibility = View.GONE
         }
 
