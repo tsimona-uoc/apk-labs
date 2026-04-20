@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -37,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
 
-        // 🎵 Iniciar música global
+        // 🎵 Música
         MusicManager.loadMusic(this)
 
         scoreRepository = ScoreRepository(
@@ -58,8 +57,7 @@ class MainActivity : AppCompatActivity() {
         checkDailyReward()
 
         btnPlayGame.setOnClickListener {
-            val intent = Intent(this, GameActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, GameActivity::class.java))
         }
 
         btnMenu.setOnClickListener {
@@ -68,8 +66,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         menuSettings.setOnClickListener {
-            Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show()
-            sideMenuCard.visibility = View.GONE
+            showLanguageDialog(sideMenuCard)
         }
 
         menuRanking.setOnClickListener {
@@ -80,10 +77,8 @@ class MainActivity : AppCompatActivity() {
             sideMenuCard.visibility = View.GONE
         }
 
-        // 🎵 BOTÓN MUSIC → ahora abre la pantalla de configuración
         menuMusic.setOnClickListener {
-            val intent = Intent(this, MusicSettingsActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, MusicSettingsActivity::class.java))
             sideMenuCard.visibility = View.GONE
         }
 
@@ -98,12 +93,8 @@ class MainActivity : AppCompatActivity() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { entity ->
-                    currentScoreEntity = entity
-                },
-                { error ->
-                    error.printStackTrace()
-                }
+                { entity -> currentScoreEntity = entity },
+                { it.printStackTrace() }
             )
 
         disposables.add(disposable)
@@ -118,9 +109,7 @@ class MainActivity : AppCompatActivity() {
                     currentScoreEntity = entity
                     updateCoinsUI(entity.score)
                 },
-                { error ->
-                    error.printStackTrace()
-                }
+                { it.printStackTrace() }
             )
 
         disposables.add(disposable)
@@ -148,9 +137,7 @@ class MainActivity : AppCompatActivity() {
                         prefs.edit().putString("last_reward_date", currentDate).apply()
                         showRewardDialog(rewardAmount)
                     },
-                    { error ->
-                        error.printStackTrace()
-                    }
+                    { it.printStackTrace() }
                 )
 
             disposables.add(disposable)
@@ -166,6 +153,26 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun showLanguageDialog(sideMenuCard: CardView) {
+        val options = arrayOf(
+            getString(R.string.language_spanish),
+            getString(R.string.language_english)
+        )
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.select_language))
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> LanguageManager.setLanguage(this, "es")
+                    1 -> LanguageManager.setLanguage(this, "en")
+                }
+
+                sideMenuCard.visibility = View.GONE
+                recreate()
+            }
+            .show()
+    }
+
     override fun onResume() {
         super.onResume()
         MusicManager.resumeMusic()
@@ -174,5 +181,10 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         disposables.clear()
         super.onDestroy()
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        val context = LanguageManager.loadLanguage(newBase)
+        super.attachBaseContext(context)
     }
 }

@@ -10,6 +10,7 @@ import com.project.luckysevens.data.ScoreEntity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.util.Log
 
 class RankingsAdapter(private var items: List<ScoreEntity> = emptyList()) :
     RecyclerView.Adapter<RankingsAdapter.ViewHolder>() {
@@ -26,7 +27,6 @@ class RankingsAdapter(private var items: List<ScoreEntity> = emptyList()) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        // Usaremos un layout personalizado que incluya nombre, puntos y fecha
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_ranking, parent, false)
         return ViewHolder(view)
@@ -34,11 +34,20 @@ class RankingsAdapter(private var items: List<ScoreEntity> = emptyList()) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
+        val context = holder.itemView.context
+
+        Log.d("DATE_DEBUG", "raw timestamp: ${item.updatedAt}")
+
         holder.tvName.text = "${position + 1}. ${item.username}"
-        holder.tvScore.text = "${item.score} Coins"
-        
-        // Formatear la fecha
-        val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+
+        holder.tvScore.text = context.getString(R.string.coins_amount, item.score)
+
+        val sdf = SimpleDateFormat.getDateTimeInstance(
+            SimpleDateFormat.SHORT,
+            SimpleDateFormat.SHORT,
+            Locale.getDefault()
+        )
+
         holder.tvDate.text = sdf.format(Date(item.updatedAt))
     }
 

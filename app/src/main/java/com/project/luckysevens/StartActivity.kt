@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 
 
 class StartActivity : AppCompatActivity() {
@@ -20,5 +21,10 @@ class StartActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        val context = LanguageManager.loadLanguage(newBase)
+        super.attachBaseContext(context)
     }
 }

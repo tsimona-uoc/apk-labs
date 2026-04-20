@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="LUCKY SEVENS"
+            android:text="@string/title_lucky_sevens"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -39,7 +39,7 @@
             android:id="@+id/tvCoinsGame"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Coins: 125"
+            android:text="@string/coins_label"
             android:textColor="#FFD700"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -48,11 +48,11 @@
     <!-- Botón PRIZES -->
     <Button
         android:id="@+id/btnTogglePaytable"
-        android:layout_width="100dp"
+        android:layout_width="120dp"
         android:layout_height="45dp"
         android:layout_margin="12dp"
         android:backgroundTint="#FFD700"
-        android:text="PRIZES"
+        android:text="@string/btn_prizes"
         android:textColor="#4A148C"
         android:textSize="14sp"
         android:textStyle="bold"
@@ -60,7 +60,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBarGame" />
 
-    <!-- Tabla de Premios (Flotante a la izquierda) -->
+    <!-- Tabla de Premios -->
     <androidx.cardview.widget.CardView
         android:id="@+id/paytableCard"
         android:layout_width="wrap_content"
@@ -72,8 +72,7 @@
         app:cardElevation="10dp"
         app:layout_constraintBottom_toTopOf="@id/betControls"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnTogglePaytable"
-        app:layout_constraintVertical_bias="0">
+        app:layout_constraintTop_toBottomOf="@id/btnTogglePaytable">
 
         <LinearLayout
             android:layout_width="150dp"
@@ -85,205 +84,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="PRIZES"
+                android:text="@string/btn_prizes"
                 android:textColor="#FFD700"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
             <View
-                android:layout_width="100dp"
+                android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_gravity="center"
                 android:layout_marginVertical="4dp"
-                android:background="#FFD700" />
-
-            <!-- Filas de premios -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:padding="2dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_rubi" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_rubi" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_rubi" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" x50"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:padding="2dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_siete" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_siete" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_siete" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" x20"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:padding="2dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_campana" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_campana" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_campana" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" x15"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:padding="2dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_sandia" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_sandia" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_sandia" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" x10"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:padding="2dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_naranja" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_naranja" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_naranja" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" x5"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:padding="2dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_cereza" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_cereza" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_cereza" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" x3"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="100dp"
-                android:layout_height="1dp"
-                android:layout_gravity="center"
-                android:layout_marginVertical="4dp"
-                android:background="#7B1FA2" />
+                android:background="#FFFFFF" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -304,68 +114,57 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" PAIR=x2"
+                    android:text="@string/pair_multiplier"
                     android:textColor="#FFD700"
                     android:textSize="15sp"
                     android:textStyle="bold|italic" />
             </LinearLayout>
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Contenedor de Rodillos (Central) -->
+    <!-- Slots -->
     <LinearLayout
         android:id="@+id/slotContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#FFD700"
+        android:background="#FFFFFF"
         android:orientation="horizontal"
         android:padding="12dp"
         app:layout_constraintBottom_toTopOf="@id/betControls"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBarGame"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBarGame">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:id="@+id/slot1"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:layout_marginEnd="8dp"
-            android:background="#31164B"
-            android:padding="8dp"
-            android:scaleType="centerInside"
             android:src="@drawable/ic_siete" />
 
         <ImageView
             android:id="@+id/slot2"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:layout_marginEnd="8dp"
-            android:background="#31164B"
-            android:padding="8dp"
-            android:scaleType="centerInside"
             android:src="@drawable/ic_siete" />
 
         <ImageView
             android:id="@+id/slot3"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:background="#31164B"
-            android:padding="8dp"
-            android:scaleType="centerInside"
             android:src="@drawable/ic_siete" />
     </LinearLayout>
 
-    <!-- Controles de Apuesta -->
+    <!-- Apuesta -->
     <LinearLayout
         android:id="@+id/betControls"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@id/btnSpin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:id="@+id/btnMinus"
@@ -373,21 +172,22 @@
             android:layout_height="wrap_content"
             android:padding="12dp"
             android:text="-"
-            android:textColor="#E1BEE7"
-            android:textSize="36sp"
-            android:textStyle="bold" />
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/tvBetAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:background="#F3E5F5"
+            android:background="#6A1B9A"
             android:paddingHorizontal="20dp"
             android:paddingVertical="10dp"
-            android:text="10 COINS"
-            android:textColor="#000000"
-            android:textStyle="bold" />
+            android:text="@string/bet_amount"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/btnPlus"
@@ -395,25 +195,19 @@
             android:layout_height="wrap_content"
             android:padding="12dp"
             android:text="+"
-            android:textColor="#E1BEE7"
-            android:textSize="36sp"
-            android:textStyle="bold" />
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="22sp" />
     </LinearLayout>
 
-    <!-- Botón SPIN -->
+    <!-- SPIN -->
     <Button
         android:id="@+id/btnSpin"
         android:layout_width="200dp"
         android:layout_height="65dp"
-        android:layout_marginBottom="32dp"
-        android:backgroundTint="#7E57C2"
-        android:text="😁 SPIN"
-        android:textColor="#FFFFFF"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        app:cornerRadius="16dp"
+        android:text="@string/btn_spin"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

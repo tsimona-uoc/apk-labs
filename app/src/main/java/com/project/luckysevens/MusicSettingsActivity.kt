@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 
 class MusicSettingsActivity : AppCompatActivity() {
 
@@ -63,5 +64,10 @@ class MusicSettingsActivity : AppCompatActivity() {
                 MusicManager.playCustomMusic(this, audioUri)
             }
         }
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        val context = LanguageManager.loadLanguage(newBase)
+        super.attachBaseContext(context)
     }
 }

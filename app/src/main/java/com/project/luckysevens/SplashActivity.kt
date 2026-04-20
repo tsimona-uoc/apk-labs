@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,5 +19,10 @@ class SplashActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }, 2000)
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        val context = LanguageManager.loadLanguage(newBase)
+        super.attachBaseContext(context)
     }
 }

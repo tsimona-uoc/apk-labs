@@ -1,0 +1,65 @@
+<resources>
+
+    <!-- App -->
+    <string name="app_name">Lucky Sevens</string>
+
+    <!-- UI general -->
+    <string name="menu_icon">≡</string>
+    <string name="title_lucky_sevens">LUCKY SEVENS</string>
+    <string name="coins_label">Coins: %d</string>
+
+    <!-- Menú -->
+    <string name="menu_settings">Settings</string>
+    <string name="menu_ranking">Ranking</string>
+    <string name="menu_music">Music</string>
+
+    <!-- Botones principales -->
+    <string name="btn_play">😊 PLAY</string>
+    <string name="btn_play_guest">PLAY AS GUEST</string>
+    <string name="btn_login">LOGIN</string>
+    <string name="btn_spin">😁 SPIN</string>
+    <string name="btn_prizes">PRIZES</string>
+
+    <!-- Emojis -->
+    <string name="icon_settings">⚙️</string>
+    <string name="icon_ranking">⭐</string>
+    <string name="icon_music">🔊</string>
+
+    <!-- Daily Reward -->
+    <string name="daily_reward_title">Congratulations!</string>
+    <string name="daily_reward_message">DAILY REWARD!\nYou received %d coins for logging in today. 🎰✨</string>
+    <string name="daily_reward_button">AWESOME!</string>
+
+    <!-- Bet / coins dinámicos -->
+    <string name="bet_amount">%d coins</string>
+    <string name="coins_amount">%d coins</string>
+
+    <!-- Mensajes de juego -->
+    <string name="not_enough_coins">Not enough coins</string>
+    <string name="win_message">YOU WON %d COINS! 🎉</string>
+    <string name="win_screenshot">YOU WON %d COINS!</string>
+    <string name="screenshot_saved">Victory screenshot saved! 📸</string>
+
+    <!-- Ubicación -->
+    <string name="location_permission_denied">Location permission denied</string>
+    <string name="location_not_available">Could not get current location</string>
+    <string name="location_error">Error getting location</string>
+
+    <!-- Calendario -->
+    <string name="victory_title">Lucky Sevens Victory</string>
+    <string name="victory_description">Special victory with 2 or more rubies</string>
+
+    <!-- Otros -->
+    <string name="pair_multiplier">PAIR=x2</string>
+
+    <!-- Selector de idiomas -->
+    <string name="select_language">Select language</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="language_english">English</string>
+
+    <!-- Selector de música -->
+    <string name="music_enable">Enable music</string>
+    <string name="music_select">Choose music from device</string>
+    <string name="music_default">Use default music</string>
+
+</resources>
