@@ -5,11 +5,11 @@
     android:layout_height="match_parent"
     android:background="#4A148C">
 
-    <!-- Barra superior -->
+    <!-- Barra superior restaurada con ID btnBack para el código Kotlin -->
     <LinearLayout
         android:id="@+id/topBarGame"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:background="#7B1FA2"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -18,12 +18,16 @@
 
         <TextView
             android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
             android:text="←"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView
             android:layout_width="0dp"
@@ -32,7 +36,7 @@
             android:gravity="center"
             android:text="@string/title_lucky_sevens"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
@@ -41,7 +45,7 @@
             android:layout_height="wrap_content"
             android:text="@string/coins_label"
             android:textColor="#FFD700"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -49,12 +53,11 @@
     <Button
         android:id="@+id/btnTogglePaytable"
         android:layout_width="120dp"
-        android:layout_height="45dp"
-        android:layout_margin="12dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:backgroundTint="#FFD700"
         android:text="@string/btn_prizes"
         android:textColor="#4A148C"
-        android:textSize="14sp"
         android:textStyle="bold"
         app:cornerRadius="12dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,17 +71,16 @@
         android:layout_marginStart="16dp"
         android:visibility="gone"
         app:cardBackgroundColor="#6A1B9A"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="10dp"
-        app:layout_constraintBottom_toTopOf="@id/betControls"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnTogglePaytable">
 
         <LinearLayout
-            android:layout_width="150dp"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -86,20 +88,19 @@
                 android:layout_gravity="center"
                 android:text="@string/btn_prizes"
                 android:textColor="#FFD700"
-                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="4dp"
-                android:background="#FFFFFF" />
+                android:layout_marginVertical="8dp"
+                android:background="#40FFFFFF" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:padding="2dp">
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -109,50 +110,78 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:layout_marginStart="4dp"
                     android:src="@drawable/ic_siete" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:text="@string/pair_multiplier"
                     android:textColor="#FFD700"
-                    android:textSize="15sp"
                     android:textStyle="bold|italic" />
             </LinearLayout>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Slots -->
+    <!-- Slots (Contenedor con cajones visuales) -->
     <LinearLayout
         android:id="@+id/slotContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
+        android:background="#6A1B9A"
+        android:elevation="8dp"
         android:orientation="horizontal"
-        android:padding="12dp"
+        android:padding="16dp"
         app:layout_constraintBottom_toTopOf="@id/betControls"
-        app:layout_constraintTop_toBottomOf="@id/topBarGame"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/topBarGame">
 
-        <ImageView
-            android:id="@+id/slot1"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/ic_siete" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#FFD700"
+            android:padding="4dp">
+            <ImageView
+                android:id="@+id/slot1"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:background="#4A148C"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_siete" />
+        </FrameLayout>
 
-        <ImageView
-            android:id="@+id/slot2"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/ic_siete" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:background="#FFD700"
+            android:padding="4dp">
+            <ImageView
+                android:id="@+id/slot2"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:background="#4A148C"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_siete" />
+        </FrameLayout>
 
-        <ImageView
-            android:id="@+id/slot3"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/ic_siete" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:background="#FFD700"
+            android:padding="4dp">
+            <ImageView
+                android:id="@+id/slot3"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:background="#4A148C"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_siete" />
+        </FrameLayout>
     </LinearLayout>
 
     <!-- Apuesta -->
@@ -162,50 +191,62 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
+        android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toTopOf="@id/btnSpin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:id="@+id/btnMinus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="12dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
             android:text="-"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
-            android:textSize="22sp" />
+            android:textSize="28sp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <TextView
             android:id="@+id/tvBetAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
+            android:layout_marginHorizontal="20dp"
             android:background="#6A1B9A"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="10dp"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp"
             android:text="@string/bet_amount"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
-            android:textSize="18sp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/btnPlus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="12dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
             android:text="+"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
-            android:textSize="22sp" />
+            android:textSize="28sp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
     </LinearLayout>
 
     <!-- SPIN -->
     <Button
         android:id="@+id/btnSpin"
-        android:layout_width="200dp"
-        android:layout_height="65dp"
+        android:layout_width="220dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="#7B1FA2"
         android:text="@string/btn_spin"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:cornerRadius="35dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

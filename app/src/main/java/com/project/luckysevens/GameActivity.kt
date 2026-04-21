@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.media.AudioAttributes
 import android.media.SoundPool
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -313,7 +314,7 @@ class GameActivity : AppCompatActivity() {
             setShadowLayer(5f, 0f, 0f, Color.BLACK)
         }
 
-        val text = getString(R.string.win_message, winnings)
+        val text = getString(R.string.win_screenshot, winnings)
         canvas.drawText(text, (bitmap.width / 2).toFloat(), bitmap.height - 100f, paint)
 
         val disposable = Completable.fromAction {
@@ -420,13 +421,73 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun handleVictoryWithLocation() {
-        openCalendarEventWithoutLocation()
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            openCalendarEventWithoutLocation()
+            return
+        }
+        try {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    saveVictoryLocationAndOpenCalendar(location.latitude, location.longitude)
+                } else {
+                    openCalendarEventWithoutLocation()
+                }
+            }.addOnFailureListener { openCalendarEventWithoutLocation() }
+        } catch (e: SecurityException) {
+            openCalendarEventWithoutLocation()
+        }
+    }
+
+    private fun saveVictoryLocationAndOpenCalendar(latitude: Double, longitude: Double) {
+        val eventTitle = getString(R.string.victory_title)
+        val victoryType = "DOUBLE_RUBY_WIN"
+
+        val disposable = victoryLocationRepository.saveVictoryLocation(
+            username = username,
+            latitude = latitude,
+            longitude = longitude,
+            victoryType = victoryType,
+            coinsAfterWin = pendingVictoryCoins,
+            calendarEventTitle = eventTitle
+        )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { openCalendarEventWithLocation(eventTitle, latitude, longitude) },
+                { error ->
+                    error.printStackTrace()
+                    openCalendarEventWithLocation(eventTitle, latitude, longitude)
+                }
+            )
+        disposables.add(disposable)
+    }
+
+    private fun openCalendarEventWithLocation(title: String, latitude: Double, longitude: Double) {
+        val beginTime = Calendar.getInstance().apply { add(Calendar.MINUTE, 5) }
+        val endTime = Calendar.getInstance().apply { add(Calendar.MINUTE, 35) }
+        val locationText = "Lat: $latitude, Lon: $longitude"
+
+        val intent = Intent(Intent.ACTION_INSERT).apply {
+            data = CalendarContract.Events.CONTENT_URI
+            putExtra(CalendarContract.Events.TITLE, title)
+            putExtra(CalendarContract.Events.DESCRIPTION, getString(R.string.victory_description))
+            putExtra(CalendarContract.Events.EVENT_LOCATION, locationText)
+            putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.timeInMillis)
+            putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.timeInMillis)
+        }
+        startActivity(intent)
     }
 
     private fun openCalendarEventWithoutLocation() {
+        val beginTime = Calendar.getInstance().apply { add(Calendar.MINUTE, 5) }
+        val endTime = Calendar.getInstance().apply { add(Calendar.MINUTE, 35) }
+
         val intent = Intent(Intent.ACTION_INSERT).apply {
             data = CalendarContract.Events.CONTENT_URI
-            putExtra(CalendarContract.Events.TITLE, "Lucky Sevens Victory")
+            putExtra(CalendarContract.Events.TITLE, getString(R.string.victory_title))
+            putExtra(CalendarContract.Events.DESCRIPTION, getString(R.string.victory_description))
+            putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.timeInMillis)
+            putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.timeInMillis)
         }
         startActivity(intent)
     }
