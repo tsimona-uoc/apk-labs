@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         // 🎵 Música
-        MusicManager.loadMusic(this)
+        MusicService.send(this, MusicService.ACTION_LOAD)
 
         scoreRepository = ScoreRepository(
             AppDatabase.getInstance(applicationContext).scoreDao()
@@ -183,7 +183,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        MusicManager.resumeMusic()
+        MusicService.send(this, MusicService.ACTION_RESUME)
     }
 
     override fun onDestroy() {

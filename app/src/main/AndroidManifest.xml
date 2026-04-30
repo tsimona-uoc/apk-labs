@@ -45,6 +45,11 @@
         </activity>
 
         <activity android:name=".MusicSettingsActivity"/>
+
+        <service
+            android:name=".MusicService"
+            android:exported="false" />
+
     </application>
 
 </manifest>

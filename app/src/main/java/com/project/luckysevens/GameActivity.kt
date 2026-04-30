@@ -463,8 +463,8 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun openCalendarEventWithLocation(title: String, latitude: Double, longitude: Double) {
-        val beginTime = Calendar.getInstance().apply { add(Calendar.MINUTE, 5) }
-        val endTime = Calendar.getInstance().apply { add(Calendar.MINUTE, 35) }
+        val beginTime = Calendar.getInstance()
+        val endTime = Calendar.getInstance().apply { add(Calendar.MINUTE, 30) }
         val locationText = "Lat: $latitude, Lon: $longitude"
 
         val intent = Intent(Intent.ACTION_INSERT).apply {
@@ -479,8 +479,8 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun openCalendarEventWithoutLocation() {
-        val beginTime = Calendar.getInstance().apply { add(Calendar.MINUTE, 5) }
-        val endTime = Calendar.getInstance().apply { add(Calendar.MINUTE, 35) }
+        val beginTime = Calendar.getInstance()
+        val endTime = Calendar.getInstance().apply { add(Calendar.MINUTE, 30) }
 
         val intent = Intent(Intent.ACTION_INSERT).apply {
             data = CalendarContract.Events.CONTENT_URI
@@ -501,7 +501,7 @@ class GameActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        MusicManager.resumeMusic()
+        MusicService.send(this, MusicService.ACTION_RESUME)
     }
 
     override fun attachBaseContext(newBase: Context) {

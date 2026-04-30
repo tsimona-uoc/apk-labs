@@ -33,9 +33,13 @@ object MusicManager {
         prefs.edit().putBoolean(KEY_IS_PLAYING, false).apply()
     }
 
-    fun resumeMusic() {
-        if (isPlaying) {
+    fun resumeMusic(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val shouldBePlaying = prefs.getBoolean(KEY_IS_PLAYING, true)
+
+        if (shouldBePlaying && mediaPlayer != null && !isPlaying) {
             mediaPlayer?.start()
+            isPlaying = true
         }
     }
 

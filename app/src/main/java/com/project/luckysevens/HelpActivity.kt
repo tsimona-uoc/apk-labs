@@ -58,6 +58,6 @@ class HelpActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        MusicManager.resumeMusic()
+        MusicService.send(this, MusicService.ACTION_RESUME)
     }
 }

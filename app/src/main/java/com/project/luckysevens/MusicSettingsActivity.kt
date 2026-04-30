@@ -31,20 +31,24 @@ class MusicSettingsActivity : AppCompatActivity() {
         // Switch ON/OFF
         switchMusic.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                MusicManager.startMusic(this)
+                MusicService.send(this, MusicService.ACTION_START)
             } else {
-                MusicManager.pauseMusic(this)
+                MusicService.send(this, MusicService.ACTION_PAUSE)
             }
         }
 
         btnDefaultMusic.setOnClickListener {
-            MusicManager.playDefaultMusic(this)
+            MusicService.send(this, MusicService.ACTION_DEFAULT)
         }
 
         // BOTÓN → abrir selector de archivos
         btnSelectMusic.setOnClickListener {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.type = "audio/*"
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                type = "audio/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+            }
             startActivityForResult(intent, PICK_AUDIO_REQUEST)
         }
     }
@@ -61,7 +65,7 @@ class MusicSettingsActivity : AppCompatActivity() {
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
 
-                MusicManager.playCustomMusic(this, audioUri)
+                MusicService.send(this, MusicService.ACTION_CUSTOM, audioUri)
             }
         }
     }
