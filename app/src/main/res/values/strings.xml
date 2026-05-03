@@ -76,4 +76,15 @@
     <string name="music_select">Elegir música del dispositivo</string>
     <string name="music_default">Usar música por defecto</string>
 
+
+    <string name="login_invalid_google_credential">Credencial de Google no válida</string>
+    <string name="login_google_error">No se pudo iniciar sesión con Google</string>
+    <string name="login_unexpected_error">Error inesperado al iniciar sesión</string>
+    <string name="login_success">Sesión iniciada como %s</string>
+    <string name="login_user_not_found">No se pudo obtener el usuario autenticado</string>
+    <string name="login_player_save_error">Login correcto, pero no se pudo guardar el jugador</string>
+    <string name="login_firebase_error">Firebase no pudo autenticar la cuenta</string>
+    <string name="guest_player">Jugador invitado</string>
+    <string name="default_player_name">Jugador</string>
+
 </resources>

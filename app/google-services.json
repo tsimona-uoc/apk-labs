@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "793172002590",
+    "firebase_url": "https://lucky-sevens-apklabs-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "lucky-sevens-apklabs",
+    "storage_bucket": "lucky-sevens-apklabs.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:793172002590:android:a944b2b33c84787a2b6b0f",
+        "android_client_info": {
+          "package_name": "com.project.luckysevens"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "793172002590-19v0k6gg5duiue519fl4258i1hndqlin.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.project.luckysevens",
+            "certificate_hash": "fc22926da20bdf8c4f9438cad2b4c7445753f8a5"
+          }
+        },
+        {
+          "client_id": "793172002590-s9si71vb2ueb7j5d5veklcn0j7rj6o4b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-g2pVunpIidlbIavGiLWUzJg8UMOeL6Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "793172002590-s9si71vb2ueb7j5d5veklcn0j7rj6o4b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

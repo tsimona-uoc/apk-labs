@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.legacy.kapt)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -61,4 +62,17 @@ dependencies {
     // Fragments
     implementation("androidx.fragment:fragment-ktx:1.8.9")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.database)
+
+    // Google Sign-In con Credential Manager
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
+
 }

@@ -76,4 +76,15 @@
     <string name="music_select">Choose music from device</string>
     <string name="music_default">Use default music</string>
 
+
+    <string name="login_invalid_google_credential">Invalid Google credential</string>
+    <string name="login_google_error">Could not sign in with Google</string>
+    <string name="login_unexpected_error">Unexpected error while signing in</string>
+    <string name="login_success">Signed in as %s</string>
+    <string name="login_user_not_found">Could not get authenticated user</string>
+    <string name="login_player_save_error">Login successful, but the player could not be saved</string>
+    <string name="login_firebase_error">Firebase could not authenticate the account</string>
+    <string name="guest_player">Guest player</string>
+    <string name="default_player_name">Player</string>
+
 </resources>
