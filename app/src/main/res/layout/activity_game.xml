@@ -40,6 +40,16 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/tvCommonPrize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="Prize: 0"
+            android:textColor="#00FF00"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/tvCoinsGame"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

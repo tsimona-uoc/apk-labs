@@ -47,6 +47,11 @@
 
         <activity android:name=".MusicSettingsActivity"/>
 
+        <activity
+            android:name=".OnlineRankingActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape" />
+
         <service
             android:name=".MusicService"
             android:exported="false" />

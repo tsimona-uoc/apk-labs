@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         val menuSettings = findViewById<LinearLayout>(R.id.menuSettings)
         val menuRanking = findViewById<LinearLayout>(R.id.menuRanking)
+        val menuOnlineRanking = findViewById<LinearLayout>(R.id.menuOnlineRanking)
         val menuMusic = findViewById<LinearLayout>(R.id.menuMusic)
         val menuHelp = findViewById<LinearLayout>(R.id.menuHelp)
 
@@ -76,6 +77,11 @@ class MainActivity : AppCompatActivity() {
                 replace(R.id.fragment_container, RankingFragment())
                 setReorderingAllowed(true)
             }
+            sideMenuCard.visibility = View.GONE
+        }
+
+        menuOnlineRanking.setOnClickListener {
+            startActivity(Intent(this, OnlineRankingActivity::class.java))
             sideMenuCard.visibility = View.GONE
         }
 

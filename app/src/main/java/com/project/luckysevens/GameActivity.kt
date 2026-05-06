@@ -45,6 +45,7 @@ class GameActivity : AppCompatActivity() {
     private lateinit var gameManager: GameManager
     private lateinit var scoreRepository: ScoreRepository
     private lateinit var tvCoins: TextView
+    private lateinit var tvCommonPrize: TextView
     private lateinit var tvBetAmount: TextView
     private lateinit var slot1: ImageView
     private lateinit var slot2: ImageView
@@ -119,6 +120,7 @@ class GameActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         tvCoins = findViewById(R.id.tvCoinsGame)
+        tvCommonPrize = findViewById(R.id.tvCommonPrize)
         tvBetAmount = findViewById(R.id.tvBetAmount)
         slot1 = findViewById(R.id.slot1)
         slot2 = findViewById(R.id.slot2)
@@ -133,6 +135,7 @@ class GameActivity : AppCompatActivity() {
 
         updateUI()
         loadSavedScore()
+        observeCommonPrize()
 
         btnBack.setOnClickListener { finish() }
 
@@ -268,6 +271,16 @@ class GameActivity : AppCompatActivity() {
                         ).show()
 
                         notifyVictory(winnings, finalCoins)
+
+                        // Guardar victoria en Firebase
+                        com.project.luckysevens.data.online.OnlineScoreRepository().saveVictory(winnings)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                android.util.Log.d("GameActivity", "Victoria guardada en Firebase")
+                            }, { 
+                                android.util.Log.e("GameActivity", "Error al guardar victoria en Firebase", it)
+                            })
                     }
 
                     isSpinning = false
@@ -490,6 +503,17 @@ class GameActivity : AppCompatActivity() {
             putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.timeInMillis)
         }
         startActivity(intent)
+    }
+
+    private fun observeCommonPrize() {
+        val onlineRepo = com.project.luckysevens.data.online.OnlineScoreRepository()
+        val disposable = onlineRepo.observeCommonPrize()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ prize ->
+                tvCommonPrize.text = "Prize: $prize"
+            }, { it.printStackTrace() })
+        disposables.add(disposable)
     }
 
     override fun onDestroy() {

@@ -49,7 +49,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    // Room - Usando las librerías definidas en el TOML
+    // Room
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
@@ -59,7 +59,7 @@ dependencies {
     implementation(libs.rxandroid)
     implementation(libs.rxjava)
 
-    // Fragments
+    // Fragments y Location
     implementation("androidx.fragment:fragment-ktx:1.8.9")
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
@@ -68,11 +68,17 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database)
 
-    // Google Sign-In con Credential Manager
+    // Retrofit + Moshi (Marius)
+    implementation(libs.retrofit.lib)
+    implementation(libs.retrofit.moshi)
+    implementation(libs.retrofit.rxjava3)
+    implementation(libs.moshi.lib)
+    implementation(libs.moshi.kotlin)
+
+    // Google Sign-In
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
 
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
-
 }
