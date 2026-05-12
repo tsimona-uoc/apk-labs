@@ -35,6 +35,7 @@
     <!-- Bet / coins dinámicos -->
     <string name="bet_amount">%d monedas</string>
     <string name="coins_amount">%d monedas</string>
+    <string name="common_prize_label">Premio Común: %d</string>
 
     <!-- Mensajes de juego -->
     <string name="not_enough_coins">No tienes suficientes monedas</string>

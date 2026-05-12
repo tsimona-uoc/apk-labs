@@ -35,6 +35,7 @@
     <!-- Bet / coins -->
     <string name="bet_amount">%d coins</string>
     <string name="coins_amount">%d coins</string>
+    <string name="common_prize_label">Common Prize: %d</string>
 
     <!-- Game messages -->
     <string name="not_enough_coins">You don\'t have enough coins</string>

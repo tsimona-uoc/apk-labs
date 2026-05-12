@@ -21,7 +21,7 @@ class OnlineScoreRepository {
     /**
      * Guarda una victoria en Firebase usando el SDK.
      */
-    fun saveVictory(winnings: Int): Completable {
+    fun saveVictory(winnings: Int, commonPrizeWon: Int = 0): Completable {
         return Completable.create { emitter ->
             val user = auth.currentUser
             if (user == null) {
@@ -29,18 +29,18 @@ class OnlineScoreRepository {
                 return@create
             }
 
+            val totalWinnings = winnings + commonPrizeWon
             val victoryId = database.child("victories").push().key ?: ""
             val victory = VictoryDto(
                 username = user.displayName ?: user.email ?: "Anónimo",
-                winnings = winnings,
+                winnings = totalWinnings,
                 date = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault()).format(java.util.Date()),
                 timestamp = System.currentTimeMillis()
             )
 
             database.child("victories").child(victoryId).setValue(victory)
                 .addOnSuccessListener { 
-                    updatePlayerScore(user.uid, winnings)
-                    updateCommonPrize(winnings / 10) // El 10% va al premio común
+                    updatePlayerScore(user.uid, totalWinnings)
                     emitter.onComplete() 
                 }
                 .addOnFailureListener { emitter.onError(it) }
@@ -56,42 +56,6 @@ class OnlineScoreRepository {
             "lastLogin" to ServerValue.TIMESTAMP
         )
         database.child("players").child(uid).updateChildren(updates)
-    }
-
-    /**
-     * Actualiza el premio común (Common Prize) usando una transacción para evitar colisiones.
-     */
-    private fun updateCommonPrize(amount: Int) {
-        database.child("commonPrize").runTransaction(object : Transaction.Handler {
-            override fun doTransaction(mutableData: MutableData): Transaction.Result {
-                val currentPrize = mutableData.getValue(Int::class.java) ?: 0
-                mutableData.value = currentPrize + amount
-                return Transaction.success(mutableData)
-            }
-
-            override fun onComplete(error: DatabaseError?, committed: Boolean, snapshot: DataSnapshot?) {
-            }
-        })
-    }
-
-    /**
-     * Observa el premio común en tiempo real.
-     */
-    fun observeCommonPrize(): Observable<Int> {
-        return Observable.create { emitter ->
-            val listener = object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val prize = snapshot.getValue(Int::class.java) ?: 0
-                    emitter.onNext(prize)
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    emitter.onError(error.toException())
-                }
-            }
-            database.child("commonPrize").addValueEventListener(listener)
-            emitter.setCancellable { database.child("commonPrize").removeEventListener(listener) }
-        }
     }
 
     /**

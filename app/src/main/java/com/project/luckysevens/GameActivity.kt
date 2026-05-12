@@ -68,6 +68,8 @@ class GameActivity : AppCompatActivity() {
 
     private lateinit var victoryLocationRepository: VictoryLocationRepository
     private lateinit var fusedLocationClient: com.google.android.gms.location.FusedLocationProviderClient
+    private val commonPrizeRepository = com.project.luckysevens.data.online.CommonPrizeRepository()
+    private val onlineScoreRepository = com.project.luckysevens.data.online.OnlineScoreRepository()
 
     private val locationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -264,6 +266,28 @@ class GameActivity : AppCompatActivity() {
 
                         animateWin()
 
+                        // Reclamar premio común de forma atómica
+                        val claimDisposable = commonPrizeRepository.claimPrize()
+                            .flatMapCompletable { prizeWon ->
+                                if (prizeWon > 0) {
+                                    // Si ganamos premio común, lo sumamos localmente y guardamos victoria total
+                                    gameManager.setCoins(gameManager.coins + prizeWon)
+                                    runOnUiThread { 
+                                        updateUI()
+                                        Toast.makeText(this@GameActivity, "¡PREMIO COMÚN RECLAMADO: $prizeWon!", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                                onlineScoreRepository.saveVictory(winnings, prizeWon)
+                            }
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                android.util.Log.d("GameActivity", "Victoria y premio común procesados")
+                            }, { 
+                                android.util.Log.e("GameActivity", "Error al procesar victoria multijugador", it)
+                            })
+                        disposables.add(claimDisposable)
+
                         Toast.makeText(
                             this@GameActivity,
                             getString(R.string.win_message, winnings),
@@ -271,16 +295,16 @@ class GameActivity : AppCompatActivity() {
                         ).show()
 
                         notifyVictory(winnings, finalCoins)
-
-                        // Guardar victoria en Firebase
-                        com.project.luckysevens.data.online.OnlineScoreRepository().saveVictory(winnings)
+                    } else {
+                        // Si pierde, aumentamos el premio común (ej: 10% de la apuesta)
+                        val increaseAmount = (currentBet * 0.1).toInt().coerceAtLeast(1)
+                        val lossDisposable = commonPrizeRepository.incrementPrize(increaseAmount)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({
-                                android.util.Log.d("GameActivity", "Victoria guardada en Firebase")
-                            }, { 
-                                android.util.Log.e("GameActivity", "Error al guardar victoria en Firebase", it)
-                            })
+                            .subscribe({ 
+                                android.util.Log.d("GameActivity", "Premio común aumentado en $increaseAmount")
+                            }, { it.printStackTrace() })
+                        disposables.add(lossDisposable)
                     }
 
                     isSpinning = false
@@ -506,12 +530,11 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun observeCommonPrize() {
-        val onlineRepo = com.project.luckysevens.data.online.OnlineScoreRepository()
-        val disposable = onlineRepo.observeCommonPrize()
+        val disposable = commonPrizeRepository.observeCommonPrize()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ prize ->
-                tvCommonPrize.text = "Prize: $prize"
+                tvCommonPrize.text = getString(R.string.common_prize_label, prize)
             }, { it.printStackTrace() })
         disposables.add(disposable)
     }
