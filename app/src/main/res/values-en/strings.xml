@@ -89,9 +89,7 @@
     <string name="default_player_name">Player</string>
 
     <!-- Firebase OAuth -->
-    <string name="default_web_client_id">
-        121318675865-5t7d2po1mil96ad3b92qekfe56hejpnl.apps.googleusercontent.com
-    </string>
+    <string name="default_web_client_id">793172002590-s9si71vb2ueb7j5d5veklcn0j7rj6o4b.apps.googleusercontent.com</string>
 
     <string name="common_prize_claimed">
         COMMON PRIZE CLAIMED: %1$d!

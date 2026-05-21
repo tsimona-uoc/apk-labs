@@ -84,7 +84,7 @@ class StartActivity : AppCompatActivity() {
             GoogleSignInOptions.DEFAULT_SIGN_IN
         )
             .requestIdToken(
-                "121318675865-amvmcs6d77r7jnec5lq7decc0jhra6oo.apps.googleusercontent.com"
+                getString(R.string.default_web_client_id)
             )
             .requestEmail()
             .build()
