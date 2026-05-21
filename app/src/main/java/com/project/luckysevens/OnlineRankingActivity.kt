@@ -52,7 +52,14 @@ class OnlineRankingActivity : AppCompatActivity() {
                 adapter.updateData(players)
             }, { error ->
                 progressBar.visibility = View.GONE
-                Toast.makeText(this, "Error al cargar el ranking: ${error.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    getString(
+                        R.string.ranking_load_error,
+                        error.message ?: "Unknown"
+                    ),
+                    Toast.LENGTH_SHORT
+                ).show()
             })
             
         disposables.add(disposable)

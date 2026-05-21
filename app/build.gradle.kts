@@ -44,7 +44,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,7 +75,10 @@ dependencies {
     implementation(libs.moshi.lib)
     implementation(libs.moshi.kotlin)
 
-    // Google Sign-In
+    // Google Sign-In clásico
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+
+    // Credential Manager (se mantiene temporalmente)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)

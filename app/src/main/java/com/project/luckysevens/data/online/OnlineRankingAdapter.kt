@@ -28,7 +28,11 @@ class OnlineRankingAdapter(private var players: List<PlayerScoreDto>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val player = players[position]
         holder.tvRankName.text = "${position + 1}. ${player.username}"
-        holder.tvRankScore.text = "${player.score} Coins"
+        holder.tvRankScore.text =
+            holder.itemView.context.getString(
+                R.string.ranking_score,
+                player.score
+            )
         
         val dateStr = if (player.lastUpdate > 0) {
             SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(player.lastUpdate))

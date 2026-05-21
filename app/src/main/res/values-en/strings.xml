@@ -77,7 +77,7 @@
     <string name="music_select">Choose music from device</string>
     <string name="music_default">Use default music</string>
 
-
+    <!-- Login -->
     <string name="login_invalid_google_credential">Invalid Google credential</string>
     <string name="login_google_error">Could not sign in with Google</string>
     <string name="login_unexpected_error">Unexpected error while signing in</string>
@@ -87,5 +87,49 @@
     <string name="login_firebase_error">Firebase could not authenticate the account</string>
     <string name="guest_player">Guest player</string>
     <string name="default_player_name">Player</string>
+
+    <!-- Firebase OAuth -->
+    <string name="default_web_client_id">
+        121318675865-5t7d2po1mil96ad3b92qekfe56hejpnl.apps.googleusercontent.com
+    </string>
+
+    <string name="common_prize_claimed">
+        COMMON PRIZE CLAIMED: %1$d!
+    </string>
+
+    <string name="ranking_load_error">
+        Error loading ranking: %1$s
+    </string>
+
+    <string name="ranking_score">%1$d coins</string>
+
+    <string name="location_coordinates">
+        Lat: %1$f, Lon: %2$f
+    </string>
+
+    <string name="common_prize_updated">
+        Common prize increased by %1$d coins
+    </string>
+
+    <string name="icon_online">🌐</string>
+    <string name="menu_online">Online</string>
+
+    <string name="icon_logout">🚪</string>
+    <string name="menu_logout">Log out</string>
+
+    <string name="logout_confirm_title">Log out</string>
+    <string name="logout_confirm_message">
+        Are you sure you want to log out?
+    </string>
+
+    <string name="logout_yes">Yes</string>
+    <string name="logout_no">No</string>
+
+    <string name="paytable_jackpot">JACKPOT x10</string>
+    <string name="paytable_special">SPECIAL x8</string>
+    <string name="paytable_cherries">x5</string>
+    <string name="paytable_bonus">BONUS</string>
+
+    <string name="menu_login">Log in</string>
 
 </resources>

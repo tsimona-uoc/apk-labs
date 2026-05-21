@@ -77,7 +77,7 @@
     <string name="music_select">Elegir música del dispositivo</string>
     <string name="music_default">Usar música por defecto</string>
 
-
+    <!-- Login -->
     <string name="login_invalid_google_credential">Credencial de Google no válida</string>
     <string name="login_google_error">No se pudo iniciar sesión con Google</string>
     <string name="login_unexpected_error">Error inesperado al iniciar sesión</string>
@@ -87,5 +87,49 @@
     <string name="login_firebase_error">Firebase no pudo autenticar la cuenta</string>
     <string name="guest_player">Jugador invitado</string>
     <string name="default_player_name">Jugador</string>
+
+    <!-- Firebase OAuth -->
+    <string name="default_web_client_id">
+        121318675865-5t7d2po1mil96ad3b92qekfe56hejpnl.apps.googleusercontent.com
+    </string>
+
+    <string name="common_prize_claimed">
+        ¡PREMIO COMÚN RECLAMADO: %1$d!
+    </string>
+
+    <string name="ranking_load_error">
+        Error al cargar el ranking: %1$s
+    </string>
+
+    <string name="ranking_score">%1$d monedas</string>
+
+    <string name="location_coordinates">
+        Lat: %1$f, Lon: %2$f
+    </string>
+
+    <string name="common_prize_updated">
+        Premio común aumentado en %1$d monedas
+    </string>
+
+    <string name="icon_online">🌐</string>
+    <string name="menu_online">Online</string>
+
+    <string name="icon_logout">🚪</string>
+    <string name="menu_logout">Cerrar sesión</string>
+
+    <string name="logout_confirm_title">Cerrar sesión</string>
+    <string name="logout_confirm_message">
+        ¿Seguro que quieres cerrar sesión?
+    </string>
+
+    <string name="logout_yes">Sí</string>
+    <string name="logout_no">No</string>
+
+    <string name="paytable_jackpot">JACKPOT x10</string>
+    <string name="paytable_special">ESPECIAL x8</string>
+    <string name="paytable_cherries">x5</string>
+    <string name="paytable_bonus">BONUS</string>
+
+    <string name="menu_login">Iniciar sesión</string>
 
 </resources>

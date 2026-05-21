@@ -14,14 +14,14 @@
         android:contentDescription="@string/action_toggle_menu"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:navigationContentDescription="@string/action_toggle_menu"
         app:navigationIcon="@drawable/ic_menu_toolbar"
         app:title="@string/title_lucky_sevens"
         app:titleCentered="true"
-        app:titleTextColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:titleTextColor="@color/white">
 
         <TextView
             android:id="@+id/tvCoins"
@@ -34,147 +34,215 @@
             android:textSize="16sp"
             android:textStyle="bold"
             tools:text="Coins: 125" />
+
     </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/sideMenuCard"
-        android:layout_width="80dp"
+        android:layout_width="190dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:visibility="visible"
         app:cardBackgroundColor="#F3E5F5"
-        app:cardCornerRadius="40dp"
+        app:cardCornerRadius="32dp"
         app:cardElevation="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar">
 
-        <LinearLayout
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingVertical="20dp">
+            android:alignmentMode="alignMargins"
+            android:columnCount="2"
+            android:padding="6dp"
+            android:useDefaultMargins="true">
 
-
+            <!-- SETTINGS -->
             <LinearLayout
                 android:id="@+id/menuSettings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:layout_marginBottom="20dp"
-                android:clickable="true"
-                android:focusable="true">
+                android:padding="6dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/icon_settings"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     tools:text="⚙️" />
+
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="2"
                     android:text="@string/menu_settings"
+                    android:textAlignment="center"
                     android:textColor="#4A148C"
-                    android:textSize="11sp"
+                    android:textSize="9sp"
                     tools:text="Settings" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/menuRanking"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:layout_marginBottom="20dp"
-                android:clickable="true"
-                android:focusable="true">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/icon_ranking"
-                    android:textSize="24sp"
-                    tools:text="⭐" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/menu_ranking"
-                    android:textColor="#4A148C"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    tools:text="Ranking" />
-            </LinearLayout>
-
+            <!-- ONLINE -->
             <LinearLayout
                 android:id="@+id/menuOnlineRanking"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:layout_marginBottom="20dp"
-                android:clickable="true"
-                android:focusable="true">
+                android:padding="2dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🌐"
-                    android:textSize="24sp" />
+                    android:text="@string/icon_online"
+                    android:textSize="20sp" />
+
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
-                    android:text="Online"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:text="@string/menu_online"
+                    android:textAlignment="center"
                     android:textColor="#4A148C"
-                    android:textSize="11sp" />
+                    android:textSize="9sp" />
             </LinearLayout>
 
+            <!-- RANKING -->
+            <LinearLayout
+                android:id="@+id/menuRanking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="2dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/icon_ranking"
+                    android:textSize="20sp"
+                    tools:text="⭐" />
+
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:text="@string/menu_ranking"
+                    android:textAlignment="center"
+                    android:textColor="#4A148C"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    tools:text="Ranking" />
+            </LinearLayout>
+
+            <!-- MUSIC -->
             <LinearLayout
                 android:id="@+id/menuMusic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:layout_marginBottom="20dp"
-                android:clickable="true"
-                android:focusable="true">
+                android:padding="2dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/icon_music"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     tools:text="🔊" />
+
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="2"
                     android:text="@string/menu_music"
+                    android:textAlignment="center"
                     android:textColor="#4A148C"
-                    android:textSize="11sp"
+                    android:textSize="9sp"
                     tools:text="Music" />
             </LinearLayout>
 
+            <!-- HELP -->
             <LinearLayout
                 android:id="@+id/menuHelp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:clickable="true"
-                android:focusable="true">
+                android:padding="2dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/icon_help"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     tools:text="❓" />
+
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:text="@string/menu_help"
+                    android:textAlignment="center"
+                    android:textColor="#4A148C"
+                    android:textSize="9sp"
+                    tools:text="Help" />
+            </LinearLayout>
+
+            <!-- LOGIN / LOGOUT -->
+            <LinearLayout
+                android:id="@+id/menuLogout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="2dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/menu_help"
+                    android:text="@string/icon_logout"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvLogoutLabel"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:text="@string/menu_logout"
+                    android:textAlignment="center"
                     android:textColor="#4A148C"
-                    android:textSize="11sp"
-                    tools:text="Ayuda" />
+                    android:textSize="9sp" />
             </LinearLayout>
 
-        </LinearLayout>
+        </GridLayout>
+
     </androidx.cardview.widget.CardView>
 
     <androidx.fragment.app.FragmentContainerView
@@ -188,11 +256,10 @@
         app:layout_constraintTop_toBottomOf="@id/topBar"
         tools:layout="@layout/fragment_ranking" />
 
-
     <Button
         android:id="@+id/btnPlayGame"
         android:layout_width="200dp"
-        android:layout_height="60dp"
+        android:layout_height="72dp"
         android:layout_marginBottom="16dp"
         android:backgroundTint="#7E57C2"
         android:text="@string/btn_play"

@@ -39,6 +39,7 @@ import java.io.OutputStream
 import java.util.Calendar
 import kotlin.random.Random
 import android.content.Context
+import com.project.luckysevens.auth.AuthRepository
 
 class GameActivity : AppCompatActivity() {
 
@@ -56,7 +57,7 @@ class GameActivity : AppCompatActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
     private val disposables = CompositeDisposable()
-    private val username = "Jugador"
+    private lateinit var username: String
     private var isSpinning = false
 
     private var soundPool: SoundPool? = null
@@ -109,6 +110,8 @@ class GameActivity : AppCompatActivity() {
         supportActionBar?.hide()
         initSoundPool()
         NotificationHelper.createVictoryChannel(this)
+
+        username = AuthRepository().getCurrentPlayerName()
 
         gameManager = GameManager()
         scoreRepository = ScoreRepository(
@@ -272,9 +275,13 @@ class GameActivity : AppCompatActivity() {
                                 if (prizeWon > 0) {
                                     // Si ganamos premio común, lo sumamos localmente y guardamos victoria total
                                     gameManager.setCoins(gameManager.coins + prizeWon)
-                                    runOnUiThread { 
+                                    runOnUiThread {
                                         updateUI()
-                                        Toast.makeText(this@GameActivity, "¡PREMIO COMÚN RECLAMADO: $prizeWon!", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(
+                                            this@GameActivity,
+                                            getString(R.string.common_prize_claimed, prizeWon),
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                     }
                                 }
                                 onlineScoreRepository.saveVictory(winnings, prizeWon)
@@ -283,7 +290,7 @@ class GameActivity : AppCompatActivity() {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
                                 android.util.Log.d("GameActivity", "Victoria y premio común procesados")
-                            }, { 
+                            }, {
                                 android.util.Log.e("GameActivity", "Error al procesar victoria multijugador", it)
                             })
                         disposables.add(claimDisposable)
@@ -301,9 +308,25 @@ class GameActivity : AppCompatActivity() {
                         val lossDisposable = commonPrizeRepository.incrementPrize(increaseAmount)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({ 
-                                android.util.Log.d("GameActivity", "Premio común aumentado en $increaseAmount")
-                            }, { it.printStackTrace() })
+                            .subscribe({
+
+                                android.util.Log.d(
+                                    "GameActivity",
+                                    "Premio común aumentado en $increaseAmount"
+                                )
+
+                                Toast.makeText(
+                                    this@GameActivity,
+                                    getString(
+                                        R.string.common_prize_updated,
+                                        increaseAmount
+                                    ),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                            }, {
+                                it.printStackTrace()
+                            })
                         disposables.add(lossDisposable)
                     }
 
@@ -502,7 +525,11 @@ class GameActivity : AppCompatActivity() {
     private fun openCalendarEventWithLocation(title: String, latitude: Double, longitude: Double) {
         val beginTime = Calendar.getInstance()
         val endTime = Calendar.getInstance().apply { add(Calendar.MINUTE, 30) }
-        val locationText = "Lat: $latitude, Lon: $longitude"
+        val locationText = getString(
+            R.string.location_coordinates,
+            latitude,
+            longitude
+        )
 
         val intent = Intent(Intent.ACTION_INSERT).apply {
             data = CalendarContract.Events.CONTENT_URI

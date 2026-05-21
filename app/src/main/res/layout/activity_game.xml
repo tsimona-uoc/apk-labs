@@ -3,9 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#4A148C">
 
-    <!-- Barra superior restaurada con ID btnBack para el código Kotlin -->
+    <!-- TOP BAR -->
     <LinearLayout
         android:id="@+id/topBarGame"
         android:layout_width="match_parent"
@@ -20,14 +21,14 @@
             android:id="@+id/btnBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:text="←"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless" />
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="0dp"
@@ -44,10 +45,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="Prize: 0"
+            android:text="@string/common_prize_label"
             android:textColor="#00FF00"
             android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="Premio común: 50" />
 
         <TextView
             android:id="@+id/tvCoinsGame"
@@ -56,10 +58,11 @@
             android:text="@string/coins_label"
             android:textColor="#FFD700"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="Monedas: 175" />
     </LinearLayout>
 
-    <!-- Botón PRIZES -->
+    <!-- PRIZES BUTTON -->
     <Button
         android:id="@+id/btnTogglePaytable"
         android:layout_width="120dp"
@@ -73,39 +76,176 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBarGame" />
 
-    <!-- Tabla de Premios -->
+    <!-- PAYTABLE -->
     <androidx.cardview.widget.CardView
         android:id="@+id/paytableCard"
-        android:layout_width="wrap_content"
+        android:layout_width="170dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:visibility="gone"
         app:cardBackgroundColor="#6A1B9A"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnTogglePaytable">
 
         <LinearLayout
-            android:layout_width="180dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="12dp">
+            android:padding="8dp">
 
+            <!-- TITLE -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/btn_prizes"
                 android:textColor="#FFD700"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="8dp"
+                android:layout_marginVertical="6dp"
                 android:background="#40FFFFFF" />
 
+            <!-- 777 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_siete" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="2dp"
+                    android:src="@drawable/ic_siete" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="2dp"
+                    android:src="@drawable/ic_siete" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/paytable_jackpot"
+                    android:textColor="#FFD700"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- RUBIES -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_rubi" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="2dp"
+                    android:src="@drawable/ic_rubi" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="2dp"
+                    android:src="@drawable/ic_rubi" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/paytable_special"
+                    android:textColor="#00FF00"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- CHERRIES -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_cereza" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="2dp"
+                    android:src="@drawable/ic_cereza" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="2dp"
+                    android:src="@drawable/ic_cereza" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/paytable_cherries"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- DOUBLE 7 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_siete" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="2dp"
+                    android:src="@drawable/ic_siete" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/pair_multiplier"
+                    android:textColor="#FFD700"
+                    android:textSize="12sp"
+                    android:textStyle="bold|italic" />
+            </LinearLayout>
+
+            <!-- DOUBLE RUBY -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -113,29 +253,31 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_siete" />
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_rubi" />
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginStart="4dp"
-                    android:src="@drawable/ic_siete" />
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="2dp"
+                    android:src="@drawable/ic_rubi" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/pair_multiplier"
-                    android:textColor="#FFD700"
-                    android:textStyle="bold|italic" />
+                    android:layout_marginStart="6dp"
+                    android:text="@string/paytable_bonus"
+                    android:textColor="#00FF00"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
         </LinearLayout>
+
     </androidx.cardview.widget.CardView>
 
-    <!-- Slots (Contenedor con cajones visuales) -->
+    <!-- SLOT MACHINE -->
     <LinearLayout
         android:id="@+id/slotContainer"
         android:layout_width="wrap_content"
@@ -154,6 +296,7 @@
             android:layout_height="wrap_content"
             android:background="#FFD700"
             android:padding="4dp">
+
             <ImageView
                 android:id="@+id/slot1"
                 android:layout_width="90dp"
@@ -169,6 +312,7 @@
             android:layout_marginStart="12dp"
             android:background="#FFD700"
             android:padding="4dp">
+
             <ImageView
                 android:id="@+id/slot2"
                 android:layout_width="90dp"
@@ -184,6 +328,7 @@
             android:layout_marginStart="12dp"
             android:background="#FFD700"
             android:padding="4dp">
+
             <ImageView
                 android:id="@+id/slot3"
                 android:layout_width="90dp"
@@ -192,32 +337,33 @@
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_siete" />
         </FrameLayout>
+
     </LinearLayout>
 
-    <!-- Apuesta -->
+    <!-- BET CONTROLS -->
     <LinearLayout
         android:id="@+id/betControls"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toTopOf="@id/btnSpin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
             android:id="@+id/btnMinus"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:text="-"
             android:textColor="#FFFFFF"
-            android:textStyle="bold"
             android:textSize="28sp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvBetAmount"
@@ -229,24 +375,25 @@
             android:paddingVertical="12dp"
             android:text="@string/bet_amount"
             android:textColor="#FFFFFF"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textSize="20sp" />
+            tools:text="10 monedas" />
 
         <TextView
             android:id="@+id/btnPlus"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:text="+"
             android:textColor="#FFFFFF"
-            android:textStyle="bold"
             android:textSize="28sp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- SPIN -->
+    <!-- SPIN BUTTON -->
     <Button
         android:id="@+id/btnSpin"
         android:layout_width="220dp"
@@ -258,7 +405,7 @@
         android:textStyle="bold"
         app:cornerRadius="35dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

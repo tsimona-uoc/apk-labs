@@ -12,8 +12,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.commit
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.firebase.auth.FirebaseAuth
+import com.project.luckysevens.auth.AuthRepository
 import com.project.luckysevens.data.AppDatabase
 import com.project.luckysevens.data.ScoreEntity
+import com.project.luckysevens.data.ScoreRepository
 import com.project.luckysevens.fragments.ranking.RankingFragment
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -21,184 +24,474 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import com.project.luckysevens.data.ScoreRepository
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var scoreRepository: ScoreRepository
+
     private val disposables = CompositeDisposable()
-    private val username = "Jugador"
+
+    private lateinit var username: String
+
     private var currentScoreEntity: ScoreEntity? = null
+
     private lateinit var tvCoins: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
         supportActionBar?.hide()
 
-        // 🎵 Música
         MusicService.send(this, MusicService.ACTION_LOAD)
 
-        scoreRepository = ScoreRepository(
-            AppDatabase.getInstance(applicationContext).scoreDao()
-        )
+        username = AuthRepository().getCurrentPlayerName()
 
-        val topBar = findViewById<MaterialToolbar>(R.id.topBar)
-        tvCoins = findViewById(R.id.tvCoins)
-        val btnPlayGame = findViewById<Button>(R.id.btnPlayGame)
-        val sideMenuCard = findViewById<CardView>(R.id.sideMenuCard)
+        scoreRepository =
+            ScoreRepository(
+                AppDatabase
+                    .getInstance(applicationContext)
+                    .scoreDao()
+            )
 
-        val menuSettings = findViewById<LinearLayout>(R.id.menuSettings)
-        val menuRanking = findViewById<LinearLayout>(R.id.menuRanking)
-        val menuOnlineRanking = findViewById<LinearLayout>(R.id.menuOnlineRanking)
-        val menuMusic = findViewById<LinearLayout>(R.id.menuMusic)
-        val menuHelp = findViewById<LinearLayout>(R.id.menuHelp)
+        val topBar =
+            findViewById<MaterialToolbar>(R.id.topBar)
+
+        tvCoins =
+            findViewById(R.id.tvCoins)
+
+        val btnPlayGame =
+            findViewById<Button>(R.id.btnPlayGame)
+
+        val sideMenuCard =
+            findViewById<CardView>(R.id.sideMenuCard)
+
+        val menuSettings =
+            findViewById<LinearLayout>(R.id.menuSettings)
+
+        val menuRanking =
+            findViewById<LinearLayout>(R.id.menuRanking)
+
+        val menuOnlineRanking =
+            findViewById<LinearLayout>(R.id.menuOnlineRanking)
+
+        val menuMusic =
+            findViewById<LinearLayout>(R.id.menuMusic)
+
+        val menuHelp =
+            findViewById<LinearLayout>(R.id.menuHelp)
+
+        val menuLogout =
+            findViewById<LinearLayout>(R.id.menuLogout)
+
+        val tvLogoutLabel =
+            findViewById<TextView>(R.id.tvLogoutLabel)
+
+        val currentUser =
+            FirebaseAuth.getInstance().currentUser
+
+        // LOGIN / LOGOUT dinámico
+        if (currentUser == null) {
+
+            tvLogoutLabel.text =
+                getString(R.string.menu_login)
+
+            menuLogout.setOnClickListener {
+
+                startActivity(
+                    Intent(
+                        this,
+                        StartActivity::class.java
+                    )
+                )
+
+                finish()
+            }
+
+        } else {
+
+            tvLogoutLabel.text =
+                getString(R.string.menu_logout)
+
+            menuLogout.setOnClickListener {
+
+                AlertDialog.Builder(this)
+
+                    .setTitle(
+                        R.string.logout_confirm_title
+                    )
+
+                    .setMessage(
+                        R.string.logout_confirm_message
+                    )
+
+                    .setPositiveButton(
+                        R.string.logout_yes
+                    ) { _, _ ->
+
+                        FirebaseAuth
+                            .getInstance()
+                            .signOut()
+
+                        val intent =
+                            Intent(
+                                this,
+                                StartActivity::class.java
+                            )
+
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                        startActivity(intent)
+
+                        finish()
+                    }
+
+                    .setNegativeButton(
+                        R.string.logout_no,
+                        null
+                    )
+
+                    .show()
+
+                sideMenuCard.visibility =
+                    View.GONE
+            }
+        }
 
         ensureInitialScore()
+
         observePlayerScore()
+
         checkDailyReward()
 
         btnPlayGame.setOnClickListener {
-            startActivity(Intent(this, GameActivity::class.java))
+
+            startActivity(
+                Intent(
+                    this,
+                    GameActivity::class.java
+                )
+            )
         }
 
         topBar.setNavigationOnClickListener {
+
             sideMenuCard.visibility =
-                if (sideMenuCard.visibility == View.GONE) View.VISIBLE else View.GONE
+                if (sideMenuCard.visibility == View.GONE)
+                    View.VISIBLE
+                else
+                    View.GONE
         }
 
         menuSettings.setOnClickListener {
+
             showLanguageDialog(sideMenuCard)
         }
 
         menuRanking.setOnClickListener {
+
             supportFragmentManager.commit {
-                replace(R.id.fragment_container, RankingFragment())
+
+                replace(
+                    R.id.fragment_container,
+                    RankingFragment()
+                )
+
                 setReorderingAllowed(true)
             }
-            sideMenuCard.visibility = View.GONE
+
+            sideMenuCard.visibility =
+                View.GONE
         }
 
         menuOnlineRanking.setOnClickListener {
-            startActivity(Intent(this, OnlineRankingActivity::class.java))
-            sideMenuCard.visibility = View.GONE
+
+            startActivity(
+                Intent(
+                    this,
+                    OnlineRankingActivity::class.java
+                )
+            )
+
+            sideMenuCard.visibility =
+                View.GONE
         }
 
         menuMusic.setOnClickListener {
-            startActivity(Intent(this, MusicSettingsActivity::class.java))
-            sideMenuCard.visibility = View.GONE
+
+            startActivity(
+                Intent(
+                    this,
+                    MusicSettingsActivity::class.java
+                )
+            )
+
+            sideMenuCard.visibility =
+                View.GONE
         }
 
         menuHelp.setOnClickListener {
-            val intent = Intent(this, HelpActivity::class.java)
-            startActivity(intent)
-            sideMenuCard.visibility = View.GONE
+
+            startActivity(
+                Intent(
+                    this,
+                    HelpActivity::class.java
+                )
+            )
+
+            sideMenuCard.visibility =
+                View.GONE
         }
 
         supportFragmentManager.commit {
-            replace(R.id.fragment_container, RankingFragment())
+
+            replace(
+                R.id.fragment_container,
+                RankingFragment()
+            )
+
             setReorderingAllowed(true)
         }
     }
 
     private fun ensureInitialScore() {
-        val disposable = scoreRepository.ensurePlayerExists(username, 125)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { entity -> currentScoreEntity = entity },
-                { it.printStackTrace() }
-            )
+
+        val disposable =
+            scoreRepository
+                .ensurePlayerExists(
+                    username,
+                    125
+                )
+
+                .subscribeOn(Schedulers.io())
+
+                .observeOn(
+                    AndroidSchedulers.mainThread()
+                )
+
+                .subscribe(
+
+                    { entity ->
+
+                        currentScoreEntity =
+                            entity
+                    },
+
+                    { it.printStackTrace() }
+                )
 
         disposables.add(disposable)
     }
 
     private fun observePlayerScore() {
-        val disposable = scoreRepository.observePlayerScore(username)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { entity ->
-                    currentScoreEntity = entity
-                    updateCoinsUI(entity.score)
-                },
-                { it.printStackTrace() }
-            )
+
+        val disposable =
+            scoreRepository
+                .observePlayerScore(username)
+
+                .subscribeOn(Schedulers.io())
+
+                .observeOn(
+                    AndroidSchedulers.mainThread()
+                )
+
+                .subscribe(
+
+                    { entity ->
+
+                        currentScoreEntity =
+                            entity
+
+                        updateCoinsUI(entity.score)
+                    },
+
+                    { it.printStackTrace() }
+                )
 
         disposables.add(disposable)
     }
 
     private fun updateCoinsUI(amount: Int) {
-        tvCoins.text = getString(R.string.coins_label, amount)
+
+        tvCoins.text =
+            getString(
+                R.string.coins_label,
+                amount
+            )
     }
 
     private fun checkDailyReward() {
-        val prefs = getSharedPreferences("LuckySevensPrefs", Context.MODE_PRIVATE)
-        val lastRewardDate = prefs.getString("last_reward_date", "")
 
-        val sdf = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-        val currentDate = sdf.format(Date())
+        val prefs =
+            getSharedPreferences(
+                "LuckySevensPrefs",
+                Context.MODE_PRIVATE
+            )
+
+        val lastRewardDate =
+            prefs.getString(
+                "last_reward_date",
+                ""
+            )
+
+        val sdf =
+            SimpleDateFormat(
+                "yyyyMMdd",
+                Locale.getDefault()
+            )
+
+        val currentDate =
+            sdf.format(Date())
 
         if (lastRewardDate != currentDate) {
+
             val rewardAmount = 50
 
-            val disposable = scoreRepository.addReward(username, rewardAmount, 125)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    {
-                        prefs.edit().putString("last_reward_date", currentDate).apply()
-                        showRewardDialog(rewardAmount)
-                    },
-                    { it.printStackTrace() }
-                )
+            val disposable =
+                scoreRepository
+                    .addReward(
+                        username,
+                        rewardAmount,
+                        125
+                    )
+
+                    .subscribeOn(Schedulers.io())
+
+                    .observeOn(
+                        AndroidSchedulers.mainThread()
+                    )
+
+                    .subscribe(
+
+                        {
+
+                            prefs.edit()
+                                .putString(
+                                    "last_reward_date",
+                                    currentDate
+                                )
+                                .apply()
+
+                            showRewardDialog(rewardAmount)
+                        },
+
+                        { it.printStackTrace() }
+                    )
 
             disposables.add(disposable)
         }
     }
 
     private fun showRewardDialog(amount: Int) {
+
         AlertDialog.Builder(this)
-            .setTitle(R.string.daily_reward_title)
-            .setMessage(getString(R.string.daily_reward_message, amount))
-            .setPositiveButton(R.string.daily_reward_button) { dialog, _ -> dialog.dismiss() }
+
+            .setTitle(
+                R.string.daily_reward_title
+            )
+
+            .setMessage(
+
+                getString(
+                    R.string.daily_reward_message,
+                    amount
+                )
+            )
+
+            .setPositiveButton(
+                R.string.daily_reward_button
+            ) { dialog, _ ->
+
+                dialog.dismiss()
+            }
+
             .setCancelable(false)
+
             .show()
     }
 
-    private fun showLanguageDialog(sideMenuCard: CardView) {
-        val options = arrayOf(
-            getString(R.string.language_spanish),
-            getString(R.string.language_english)
-        )
+    private fun showLanguageDialog(
+        sideMenuCard: CardView
+    ) {
+
+        val options =
+            arrayOf(
+
+                getString(
+                    R.string.language_spanish
+                ),
+
+                getString(
+                    R.string.language_english
+                )
+            )
 
         AlertDialog.Builder(this)
-            .setTitle(getString(R.string.select_language))
+
+            .setTitle(
+                getString(
+                    R.string.select_language
+                )
+            )
+
             .setItems(options) { _, which ->
+
                 when (which) {
-                    0 -> LanguageManager.setLanguage(this, "es")
-                    1 -> LanguageManager.setLanguage(this, "en")
+
+                    0 ->
+
+                        LanguageManager
+                            .setLanguage(
+                                this,
+                                "es"
+                            )
+
+                    1 ->
+
+                        LanguageManager
+                            .setLanguage(
+                                this,
+                                "en"
+                            )
                 }
 
-                sideMenuCard.visibility = View.GONE
+                sideMenuCard.visibility =
+                    View.GONE
+
                 recreate()
             }
+
             .show()
     }
 
     override fun onResume() {
+
         super.onResume()
-        MusicService.send(this, MusicService.ACTION_RESUME)
+
+        MusicService.send(
+            this,
+            MusicService.ACTION_RESUME
+        )
     }
 
     override fun onDestroy() {
+
         disposables.clear()
+
         super.onDestroy()
     }
 
-    override fun attachBaseContext(newBase: Context) {
-        val context = LanguageManager.loadLanguage(newBase)
+    override fun attachBaseContext(
+        newBase: Context
+    ) {
+
+        val context =
+            LanguageManager.loadLanguage(newBase)
+
         super.attachBaseContext(context)
     }
 }
